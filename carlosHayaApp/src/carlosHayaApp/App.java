@@ -15,6 +15,10 @@ public class App extends JFrame {
 		mostrarLogin();
 	}
 
+	public JDesktopPane getEscritorio() {
+		return escritorio;
+	}
+
 	// METODO PARA CAMBIAR DE PANELES
 	public void cambiarPanel(JPanel nuevo) {
 		getContentPane().removeAll();
@@ -22,18 +26,13 @@ public class App extends JFrame {
 		revalidate();
 		repaint();
 	}
+
+	// METODO PARA ABRIR PANEL DENTRO DE OTRO PANEL
 	public void abrirMarcoInterno(JInternalFrame frame) {
-	    escritorio.add(frame);
-	    frame.setVisible(true);
+		escritorio.add(frame);
+		frame.setVisible(true);
 	}
 
-	public JDesktopPane getEscritorio() {
-	    return escritorio;
-	}
-
-	
-	// CADA UNO DE LAS FRAMES TENDRA AQUI SU METODO PARA INVOCAR
-	// SE HACE DESDE OTRA CLASE PONIENDO app.mostrarInicio();
 	// PAGINA PRIMERA QUE SE CARGA.
 	public void mostrarLogin() {
 		cambiarPanel(new LoginPanel(this));
@@ -43,7 +42,7 @@ public class App extends JFrame {
 	public void mostrarInicio() {
 		cambiarPanel(new HomePanel(this));
 	}
-		
+
 	// EL MAIN CON INVOCAR PAPI!!!!!!
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(() -> {
