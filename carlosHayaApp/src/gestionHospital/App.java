@@ -7,20 +7,22 @@ public class App extends JFrame {
 
     public App() {
         propiedades();
-        crearPanelImagen();
+        crearImagenPanel();
     }
 
-    private void crearPanelImagen() {
+    // Crear el panel de imagen y pasar la misma clase como parámetro
+    private void crearImagenPanel() {
         PanelImagen panelImagen = new PanelImagen(this);
-        this.add(panelImagen);
+        add(panelImagen);
     }
 
+    // Establecer propiedades del frame
     private void propiedades() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
-        this.setLocationRelativeTo(null); // Centrar en la pantalla
-        setVisible(true);
+        this.setLocationRelativeTo(null);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setVisible(true);
     }
 
     public static void main(String[] args) {

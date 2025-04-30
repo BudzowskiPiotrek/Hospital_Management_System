@@ -3,86 +3,114 @@ package gestionHospital;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 public class PanelLogin extends JPanel {
 
-    private JTextField usuarioField;
-    private JPasswordField contrasenaField;
-    private JButton loginButton, salirButton;
-    private PanelCardLayout cardLayoutPanel;
-    private static Border border= BorderFactory.createLineBorder(Color.black, 2);
+	private JTextField usuarioField;
+	private JPasswordField contrasenaField;
+	private JButton iniciarButton, registrarButton;
+	private PanelImagen panelIamgen;
+	private static Border border = BorderFactory.createLineBorder(Color.black, 2);
 
-    public PanelLogin(PanelCardLayout cardLayoutPanel) {
-        this.cardLayoutPanel = cardLayoutPanel;
-        setPreferredSize(new Dimension(400,400));
-        setBorder(border);
-        contenidos();
-    }
+	public PanelLogin(PanelImagen panelIamgen) {
+		this.panelIamgen = panelIamgen;
+		setPreferredSize(new Dimension(400, 300));
+		contenidos();
+	}
 
-    private void contenidos() {
-        setBackground(new Color(0x123456)); // Fondo azul oscuro
+	// Crear los componentes del panel
+	private void contenidos() {
+		setBackground(new Color(0x123456)); // Fondo azul oscuro
 
-        Font labelFont = new Font("Arial", Font.BOLD, 16);
-        Color labelColor = Color.WHITE;
+		Font labelFont = new Font("Arial", Font.BOLD, 16);
+		Color labelColor = Color.WHITE;
 
-        // Panel título
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(getBackground());
-        JLabel titleLabel = new JLabel("INICIAR SESIÓN");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setForeground(labelColor);
-        titlePanel.add(titleLabel);
+		// Panel de título
+		JPanel titlePanel = new JPanel();
+		titlePanel.setBackground(getBackground());
+		JLabel titleLabel = new JLabel("INICIAR SESIÓN");
+		titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+		titleLabel.setForeground(labelColor);
+		titlePanel.add(titleLabel);
 
-        // Panel usuario
-        JPanel usuarioPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        usuarioPanel.setBackground(getBackground());
-        JLabel usuarioLabel = new JLabel("Usuario:");
-        usuarioLabel.setFont(labelFont);
-        usuarioLabel.setForeground(labelColor);
-        usuarioField = new JTextField(15);
-        usuarioPanel.add(usuarioLabel);
-        usuarioPanel.add(usuarioField);
+		// Panel de usuario
+		JPanel usuarioPanel = new JPanel(new GridBagLayout());
+		usuarioPanel.setBackground(getBackground());
 
-        // Panel contraseña
-        JPanel contrasenaPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        contrasenaPanel.setBackground(getBackground());
-        JLabel contrasenaLabel = new JLabel("Contraseña:");
-        contrasenaLabel.setFont(labelFont);
-        contrasenaLabel.setForeground(labelColor);
-        contrasenaField = new JPasswordField(15);
-        contrasenaPanel.add(contrasenaLabel);
-        contrasenaPanel.add(contrasenaField);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridy = 0;
+		gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Panel botones
-        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        botonesPanel.setBackground(getBackground());
-        loginButton = new JButton("Iniciar");
-        salirButton = new JButton("Registrar");
+		// Configuración de la etiqueta de usuario
+		gbc.gridx = 0;
+		gbc.anchor = GridBagConstraints.WEST;
+		JLabel usuarioLabel = new JLabel("Usuario");
+		usuarioLabel.setFont(labelFont);
+		usuarioLabel.setForeground(labelColor);
+		usuarioLabel.setBorder(new EmptyBorder(0, 10, 0, 47));
+		usuarioPanel.add(usuarioLabel, gbc);
 
-        styleButton(loginButton);
-        styleButton(salirButton);
+		// Campo de texto de usuario
+		gbc.gridx = 1;
+		usuarioField = new JTextField(15);
+		usuarioField.setBorder(new EmptyBorder(0, 10, 0, 10));
+		usuarioField.setPreferredSize(new Dimension(75, 25));
+		usuarioPanel.add(usuarioField, gbc);
 
-        botonesPanel.add(loginButton);
-        botonesPanel.add(salirButton);
+		// Panel de contraseña
+		JPanel contrasenaPanel = new JPanel(new GridBagLayout());
+		contrasenaPanel.setBackground(getBackground());
 
-        // Añadir todo al panel principal
-        setLayout(new GridLayout(4, 1, 10, 0));
-        add(titlePanel);
-        add(usuarioPanel);
-        add(contrasenaPanel);
-        add(botonesPanel);
+		gbc.gridy = 0;
+		gbc.gridx = 0;
+		gbc.weightx = 0;
+		gbc.fill = GridBagConstraints.NONE;
+		gbc.anchor = GridBagConstraints.WEST;
+		JLabel contrasenaLabel = new JLabel("Contraseña");
+		contrasenaLabel.setFont(labelFont);
+		contrasenaLabel.setForeground(labelColor);
+		contrasenaLabel.setBorder(new EmptyBorder(0, 10, 0, 20));
+		contrasenaPanel.add(contrasenaLabel, gbc);
 
-        // Acciones botones
-        loginButton.addActionListener(e -> cardLayoutPanel.cambiarPanel(cardLayoutPanel.getPANELADMIN()));
-        salirButton.addActionListener(e -> cardLayoutPanel.cambiarPanel(cardLayoutPanel.getPANELREGISTRAR()));
-    }
+		gbc.gridx = 1;
+		contrasenaField = new JPasswordField(15);
+		contrasenaField.setBorder(new EmptyBorder(0, 10, 0, 10));
+		contrasenaField.setPreferredSize(new Dimension(75, 25));
+		contrasenaPanel.add(contrasenaField, gbc);
 
-    private void styleButton(JButton button) {
-        button.setBackground(Color.white);
-        button.setForeground(Color.BLACK);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(100,30));
-        button.setBorder(border);
-    }
+		// Panel de botones
+		JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		botonesPanel.setBackground(getBackground());
+		iniciarButton = new JButton("Iniciar");
+		registrarButton = new JButton("Registrar");
+
+		styleButton(iniciarButton);
+		styleButton(registrarButton);
+
+		botonesPanel.add(iniciarButton);
+		botonesPanel.add(registrarButton);
+
+		// Añadir todo al panel principal
+		setLayout(new GridLayout(4, 1, 10, 0));
+		add(titlePanel);
+		add(usuarioPanel);
+		add(contrasenaPanel);
+		add(botonesPanel);
+		
+		
+		registrarButton.addActionListener(e -> panelIamgen.cambiarPanel(new PanelRegistrar(panelIamgen)));
+	}
+
+	// Estilo de los botones
+	private void styleButton(JButton button) {
+		button.setBackground(Color.white);
+		button.setForeground(Color.BLACK);
+		button.setFont(new Font("Arial", Font.BOLD, 14));
+		button.setFocusPainted(false);
+		button.setPreferredSize(new Dimension(100, 30));
+		button.setBorder(border);
+	}
 }
