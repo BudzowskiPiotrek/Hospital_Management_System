@@ -4,20 +4,26 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 public class PanelRegistrar extends JPanel {
     private PanelImagen panelIamgen;
+    private Border border = BorderFactory.createLineBorder(Color.black, 2);
 
     public PanelRegistrar(PanelImagen panelIamgen) {
         this.panelIamgen = panelIamgen;
         setPreferredSize(new Dimension(450, 450));
         setBackground(Color.decode("#212f3d"));
         setLayout(new BorderLayout());
+        contenidos();
 
+    }
+
+    private void contenidos() {
         // === Título ===
         JLabel titleLabel = new JLabel("REGISTRAR", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 26));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.orange);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(titleLabel, BorderLayout.NORTH);
 
@@ -44,7 +50,7 @@ public class PanelRegistrar extends JPanel {
         JLabel rolLabel = new JLabel("Rol:");
         rolLabel.setFont(labelFont);
         rolLabel.setForeground(labelColor);
-        String[] roles = {"Seleccionar","Médico", "Enfermero", "Administrativo", "Otro"};
+        String[] roles = { "Seleccionar", "Médico", "Enfermero", "Administrativo", "Otro" };
         JComboBox<String> rolComboBox = new JComboBox<>(roles);
         rolComboBox.setPreferredSize(new Dimension(184, 25));
         rolComboBox.setFocusable(false);
@@ -65,32 +71,38 @@ public class PanelRegistrar extends JPanel {
         JTextField contactoField = new JTextField(20);
 
         // Añadir campos
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         formPanel.add(nombreLabel, gbc);
         gbc.gridx = 1;
         formPanel.add(nombreField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         formPanel.add(apellidoLabel, gbc);
         gbc.gridx = 1;
         formPanel.add(apellidoField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         formPanel.add(rolLabel, gbc);
         gbc.gridx = 1;
         formPanel.add(rolComboBox, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         formPanel.add(usuarioLabel, gbc);
         gbc.gridx = 1;
         formPanel.add(usuarioField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
         formPanel.add(contrasenaLabel, gbc);
         gbc.gridx = 1;
         formPanel.add(contrasenaField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0;
+        gbc.gridy = 5;
         formPanel.add(contactoLabel, gbc);
         gbc.gridx = 1;
         formPanel.add(contactoField, gbc);
@@ -131,37 +143,43 @@ public class PanelRegistrar extends JPanel {
                 String contacto = contactoField.getText().trim();
 
                 // 1. Comprobar campos vacíos
-                if (nombre.isEmpty() || apellido.isEmpty() || rol.equals("Seleccionar") ||
-                    usuario.isEmpty() || contrasena.isEmpty() || contacto.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Campos obligatorios", JOptionPane.WARNING_MESSAGE);
+                if (nombre.isEmpty() || apellido.isEmpty() || rol.equals("Seleccionar") || usuario.isEmpty()
+                        || contrasena.isEmpty() || contacto.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Campos obligatorios",
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
                 // 2. Validar nombre (sin espacios ni números)
                 if (!nombre.matches("^[A-Za-z]+$")) {
-                    JOptionPane.showMessageDialog(null, "El nombre no debe tener espacios ni números.", "Nombre inválido", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "El nombre no debe tener espacios ni números.",
+                            "Nombre inválido", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 // 3. Validar apellidos (puede tener espacios, pero no números)
                 if (!apellido.matches("^[A-Za-z\\s]+$")) {
-                    JOptionPane.showMessageDialog(null, "El apellido no debe tener números.", "Apellido inválido", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "El apellido no debe tener números.", "Apellido inválido",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 // 4. Validar contacto (9 dígitos exactos, solo números)
                 if (!contacto.matches("^\\d{9}$")) {
-                    JOptionPane.showMessageDialog(null, "El contacto debe tener exactamente 9 números.", "Contacto inválido", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "El contacto debe tener exactamente 9 números.",
+                            "Contacto inválido", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 // 5. Validación completada con éxito
-                JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Registro exitoso",
+                        JOptionPane.INFORMATION_MESSAGE);
 
-                // Aquí puedes continuar con guardar los datos, por ejemplo en una base de datos o archivo
+                // Aquí puedes continuar con guardar los datos, por ejemplo en una base de datos
+                // o archivo
                 panelIamgen.cambiarPanel(new PanelLogin(panelIamgen));
             }
-            
+
         });
 
         JPanel buttonPanel = new JPanel();
@@ -180,15 +198,15 @@ public class PanelRegistrar extends JPanel {
         formPanel.add(buttonPanel, gbc);
 
         add(formPanel, BorderLayout.CENTER);
-        
-        
+
     }
+
     private void styleButton(JButton button) {
-    	button.setBackground(Color.white);
-    	button.setForeground(Color.BLACK);
-    	button.setFont(new Font("Arial", Font.BOLD, 14));
-    	button.setFocusPainted(false);
-    	button.setPreferredSize(new Dimension(100, 30));
-    	
+        button.setBackground(Color.white);
+        button.setForeground(Color.BLACK);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(100, 30));
+        button.setBorder(border);
     }
 }

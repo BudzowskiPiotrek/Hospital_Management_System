@@ -4,8 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
 
 public class PanelLogin extends JPanel {
 
@@ -13,7 +11,7 @@ public class PanelLogin extends JPanel {
 	private JPasswordField contrasenaField;
 	private JButton iniciarButton, registrarButton;
 	private PanelImagen panelIamgen;
-	private static Border border = BorderFactory.createLineBorder(Color.black, 2);
+	private Border border = BorderFactory.createLineBorder(Color.black, 2);
 
 	public PanelLogin(PanelImagen panelIamgen) {
 		this.panelIamgen = panelIamgen;
@@ -23,7 +21,7 @@ public class PanelLogin extends JPanel {
 
 	// Crear los componentes del panel
 	private void contenidos() {
-		setBackground(new Color(0x123456)); // Fondo azul oscuro
+		setBackground(Color.decode("#212f3d")); // Fondo azul oscuro
 
 		Font labelFont = new Font("Arial", Font.BOLD, 16);
 		Color labelColor = Color.WHITE;
@@ -33,7 +31,8 @@ public class PanelLogin extends JPanel {
 		titlePanel.setBackground(getBackground());
 		JLabel titleLabel = new JLabel("INICIAR SESIÓN");
 		titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-		titleLabel.setForeground(labelColor);
+		titleLabel.setForeground(Color.orange);
+		titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 		titlePanel.add(titleLabel);
 
 		// Panel de usuario
@@ -99,8 +98,7 @@ public class PanelLogin extends JPanel {
 		add(usuarioPanel);
 		add(contrasenaPanel);
 		add(botonesPanel);
-		
-		
+
 		registrarButton.addActionListener(e -> panelIamgen.cambiarPanel(new PanelRegistrar(panelIamgen)));
 	}
 
