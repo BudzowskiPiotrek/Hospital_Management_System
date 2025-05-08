@@ -10,11 +10,11 @@ public class PanelLogin extends JPanel {
 	private JTextField usuarioField;
 	private JPasswordField contrasenaField;
 	private JButton iniciarButton, registrarButton;
-	private PanelImagen panelIamgen;
+	private PanelImagen panelImagen;
 	private Border border = BorderFactory.createLineBorder(Color.black, 2);
 
-	public PanelLogin(PanelImagen panelIamgen) {
-		this.panelIamgen = panelIamgen;
+	public PanelLogin(PanelImagen panelImagen) {
+		this.panelImagen = panelImagen;
 		setPreferredSize(new Dimension(400, 300));
 		contenidos();
 	}
@@ -99,7 +99,22 @@ public class PanelLogin extends JPanel {
 		add(contrasenaPanel);
 		add(botonesPanel);
 
-		registrarButton.addActionListener(e -> panelIamgen.cambiarPanel(new PanelRegistrar(panelIamgen)));
+		registrarButton.addActionListener(e -> panelImagen.cambiarPanel(new PanelRegistrar(panelImagen)));
+		iniciarButton.addActionListener(e -> {
+			String usuario = usuarioField.getText();
+			String contrasena = new String(contrasenaField.getPassword());
+
+			if (validarCredenciales(usuario, contrasena)) {
+				panelImagen.cambiarPanel(new PanelMedico(panelImagen));
+			} else {
+				JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
+			}
+		});
+
+	}
+
+	private boolean validarCredenciales(String usuario, String contrasena) {
+		return usuario.equals("medico");
 	}
 
 	// Estilo de los botones

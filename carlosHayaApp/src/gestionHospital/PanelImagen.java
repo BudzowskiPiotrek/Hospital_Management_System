@@ -33,7 +33,7 @@ public class PanelImagen extends JPanel {
     public void cambiarPanel(JPanel nuevoPanel) {
         this.removeAll(); // Eliminar el contenido anterior
         this.revalidate();
-        this.repaint(); 
+        this.repaint();
         posicion(nuevoPanel);// Asegurarse de que se vuelve a dibujar el panel
         this.revalidate();
         this.repaint();
@@ -41,12 +41,12 @@ public class PanelImagen extends JPanel {
 
     // Método para poner la imagen de fondo
     private void ponerImagen() {
-        img = new ImageIcon("Imagen/Hospital_Carlos_Haya.jpg").getImage();
+        img = new ImageIcon("carlosHayaApp/Imagen/Hospital_Carlos_Haya.jpg").getImage();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);  // Llama al método de la clase padre para limpiar la pantalla
+        super.paintComponent(g); // Llama al método de la clase padre para limpiar la pantalla
         if (img != null) {
             g.drawImage(img, 0, 0, getWidth(), getHeight(), this); // Dibuja la imagen de fondo
         }
