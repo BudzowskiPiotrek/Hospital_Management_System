@@ -1,1 +1,1 @@
-public class Enfermero{}
+public class Enfermero{private string nombre;}
