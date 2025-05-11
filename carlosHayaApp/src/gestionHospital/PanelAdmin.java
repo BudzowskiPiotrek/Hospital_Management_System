@@ -21,7 +21,7 @@ public class PanelAdmin extends JPanel {
 	private final PanelImagen panelImagen;
 	private Border border = BorderFactory.createLineBorder(Color.black, 1);
 	Color colorbg = Color.decode("#212f3d");
-	Color colorButton =Color.decode("#006D77");
+	Color colorButton = Color.decode("#006D77");
 
 	public PanelAdmin(PanelImagen panelImagen) {
 		this.panelImagen = panelImagen;
@@ -33,7 +33,6 @@ public class PanelAdmin extends JPanel {
 		// Establecer el tamaño preferido del panel
 		this.setBackground(colorbg);
 		this.setPreferredSize(new Dimension(700, 600));
-		
 	}
 
 	private void contenidos() {
@@ -53,51 +52,50 @@ public class PanelAdmin extends JPanel {
 		gridbagpanel.setPreferredSize(new Dimension(700, 300));
 		gridbagpanel.setBackground(colorbg);
 
-		// Create GridBagConstraints to place the buttons in the grid
+		// Crear GridBagConstraints para colocar los botones en la cuadrícula
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(10, 10, 10, 10); // Adding gap between buttons
-		gbc.fill = GridBagConstraints.BOTH; // Make buttons expand both horizontally and vertically
-		gbc.weightx = 1.0; // Allow horizontal expansion
-		gbc.weighty = 1.0; // Allow vertical expansion
+		gbc.insets = new Insets(10, 10, 10, 10); // Añadir espacio entre los botones
+		gbc.fill = GridBagConstraints.BOTH; // Hacer que los botones se expandan horizontal y verticalmente
+		gbc.weightx = 1.0; // Permitir expansión horizontal
+		gbc.weighty = 1.0; // Permitir expansión vertical
 
-		// First row, first button
+		// Primera fila, primer botón
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		JButton botn1 = new JButton("Gestionar Empleados");
 		stylePanelButton(botn1);
 		gridbagpanel.add(botn1, gbc);
 
-		// First row, second button
+		// Primera fila, segundo botón
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		JButton botn2 = new JButton("Gestionar Pacientes");
 		stylePanelButton(botn2);
 		gridbagpanel.add(botn2, gbc);
 
-		// Second row, first button
+		// Segunda fila, primer botón
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		JButton botn3 = new JButton("Gestionar Salas");
 		stylePanelButton(botn3);
 		gridbagpanel.add(botn3, gbc);
 
-		// Second row, second button
+		// Segunda fila, segundo botón
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		JButton botn4 = new JButton("Estadísticas");
 		stylePanelButton(botn4);
 		gridbagpanel.add(botn4, gbc);
 
-
 		this.add(gridbagpanel, BorderLayout.CENTER);
 
-		// Panel de botones (mantenemos el panel de abajo)
+		// Panel de botones (parte inferior)
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
 		buttonPanel.setPreferredSize(new Dimension(700, 200));
 		JButton botnInicio = new JButton("||  Cerrar Sesión  ||");
 		buttonPanel.setBackground(colorbg);
 		stylePanelButton(botnInicio);
-		botnInicio.setPreferredSize(new Dimension(300,75));
+		botnInicio.setPreferredSize(new Dimension(300, 75));
 		botnInicio.setBackground(Color.white);
 		botnInicio.setForeground(Color.black);
 		buttonPanel.add(botnInicio);
@@ -113,8 +111,6 @@ public class PanelAdmin extends JPanel {
 			}
 		});
 	}
-
-	
 
 	private void stylePanelButton(JButton button) {
 		button.setBackground(colorButton);
