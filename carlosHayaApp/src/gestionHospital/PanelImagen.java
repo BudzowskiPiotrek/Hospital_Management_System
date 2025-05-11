@@ -40,7 +40,7 @@ public class PanelImagen extends JPanel {
 
 	// Método para poner la imagen de fondo
 	private void ponerImagen() {
-		img = new ImageIcon("Imagen/Hospital_Carlos_Haya.jpg").getImage();
+		img = new ImageIcon("carlosHayaApp/Imagen/Hospital_Carlos_Haya.jpg").getImage();
 	}
 
 	@Override
