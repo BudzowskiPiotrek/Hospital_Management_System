@@ -10,8 +10,8 @@ public class PanelLogin extends JPanel {
 	private JTextField usuarioField;
 	private JPasswordField contrasenaField;
 	private JButton iniciarButton, registrarButton;
-	private PanelImagen panelImagen;
-	private Border border = BorderFactory.createLineBorder(Color.black, 2);
+	private final PanelImagen panelImagen;
+	private Border border = BorderFactory.createLineBorder(Color.black, 1);
 
 	public PanelLogin(PanelImagen panelImagen) {
 		this.panelImagen = panelImagen;
@@ -31,7 +31,7 @@ public class PanelLogin extends JPanel {
 		titlePanel.setBackground(getBackground());
 		JLabel titleLabel = new JLabel("INICIAR SESIÓN");
 		titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-		titleLabel.setForeground(Color.orange);
+		titleLabel.setForeground(Color.decode("#F4D35E"));
 		titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 		titlePanel.add(titleLabel);
 
@@ -93,7 +93,7 @@ public class PanelLogin extends JPanel {
 		botonesPanel.add(registrarButton);
 
 		// Añadir todo al panel principal
-		setLayout(new GridLayout(4, 1, 10, 0));
+		setLayout(new GridLayout(4, 1,30, 30));
 		add(titlePanel);
 		add(usuarioPanel);
 		add(contrasenaPanel);
@@ -103,18 +103,26 @@ public class PanelLogin extends JPanel {
 		iniciarButton.addActionListener(e -> {
 			String usuario = usuarioField.getText();
 			String contrasena = new String(contrasenaField.getPassword());
+			switchParaCambiarPanel(usuario, contrasena);
 
-			if (validarCredenciales(usuario, contrasena)) {
-				panelImagen.cambiarPanel(new PanelMedico(panelImagen));
-			} else {
-				JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
-			}
 		});
 
 	}
 
-	private boolean validarCredenciales(String usuario, String contrasena) {
-		return usuario.equals("medico");
+	private void switchParaCambiarPanel(String usuario, String contrasena) {
+		switch (usuario) {
+		case "medico":
+			panelImagen.cambiarPanel(new PanelMedico(panelImagen));
+			break;
+		case "admin":
+			panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
+			break;
+		 default:
+			 JOptionPane.showMessageDialog(null, "Error: Introduce un usuario Valido!!");
+			 break;
+			
+
+		}
 	}
 
 	// Estilo de los botones

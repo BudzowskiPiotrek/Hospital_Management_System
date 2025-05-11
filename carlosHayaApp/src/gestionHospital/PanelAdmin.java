@@ -17,13 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-public class PanelMedico extends JPanel {
+public class PanelAdmin extends JPanel {
 	private final PanelImagen panelImagen;
 	private Border border = BorderFactory.createLineBorder(Color.black, 1);
 	Color colorbg = Color.decode("#212f3d");
-	Color colorButton = Color.decode("#006D77");
+	Color colorButton =Color.decode("#006D77");
 
-	public PanelMedico(PanelImagen panelImagen) {
+	public PanelAdmin(PanelImagen panelImagen) {
 		this.panelImagen = panelImagen;
 		propiedades();
 		contenidos();
@@ -33,14 +33,14 @@ public class PanelMedico extends JPanel {
 		// Establecer el tamaño preferido del panel
 		this.setBackground(colorbg);
 		this.setPreferredSize(new Dimension(700, 600));
-
+		
 	}
 
 	private void contenidos() {
 
 		// Panel de título
 		JPanel tittlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JLabel title = new JLabel("MEDICO");
+		JLabel title = new JLabel("ADMIN");
 		title.setFont(new Font("Arial", Font.BOLD, 35));
 		title.setForeground(Color.decode("#F4D35E"));
 		tittlePanel.setBackground(colorbg);
@@ -55,7 +55,6 @@ public class PanelMedico extends JPanel {
 
 		// Create GridBagConstraints to place the buttons in the grid
 		GridBagConstraints gbc = new GridBagConstraints();
-		
 		gbc.insets = new Insets(10, 10, 10, 10); // Adding gap between buttons
 		gbc.fill = GridBagConstraints.BOTH; // Make buttons expand both horizontally and vertically
 		gbc.weightx = 1.0; // Allow horizontal expansion
@@ -64,30 +63,31 @@ public class PanelMedico extends JPanel {
 		// First row, first button
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		JButton botn1 = new JButton("Ver Pacientes");
+		JButton botn1 = new JButton("Gestionar Empleados");
 		stylePanelButton(botn1);
 		gridbagpanel.add(botn1, gbc);
 
 		// First row, second button
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		JButton botn2 = new JButton("Ver/Agregar Historial");
+		JButton botn2 = new JButton("Gestionar Pacientes");
 		stylePanelButton(botn2);
 		gridbagpanel.add(botn2, gbc);
 
 		// Second row, first button
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		JButton botn3 = new JButton("Registrar Diagnóstico");
+		JButton botn3 = new JButton("Gestionar Salas");
 		stylePanelButton(botn3);
 		gridbagpanel.add(botn3, gbc);
 
 		// Second row, second button
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		JButton botn4 = new JButton("Recetar Medicación");
+		JButton botn4 = new JButton("Estadísticas");
 		stylePanelButton(botn4);
 		gridbagpanel.add(botn4, gbc);
+
 
 		this.add(gridbagpanel, BorderLayout.CENTER);
 
@@ -97,7 +97,7 @@ public class PanelMedico extends JPanel {
 		JButton botnInicio = new JButton("||  Cerrar Sesión  ||");
 		buttonPanel.setBackground(colorbg);
 		stylePanelButton(botnInicio);
-		botnInicio.setPreferredSize(new Dimension(300, 75));
+		botnInicio.setPreferredSize(new Dimension(300,75));
 		botnInicio.setBackground(Color.white);
 		botnInicio.setForeground(Color.black);
 		buttonPanel.add(botnInicio);
@@ -113,6 +113,8 @@ public class PanelMedico extends JPanel {
 			}
 		});
 	}
+
+	
 
 	private void stylePanelButton(JButton button) {
 		button.setBackground(colorButton);
