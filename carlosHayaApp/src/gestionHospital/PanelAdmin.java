@@ -1,122 +1,160 @@
 package gestionHospital;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 public class PanelAdmin extends JPanel {
-	private final PanelImagen panelImagen;
-	private Border border = BorderFactory.createLineBorder(Color.black, 1);
-	Color colorbg = Color.decode("#212f3d");
-	Color colorButton = Color.decode("#006D77");
+    private final PanelImagen panelImagen;
+    private Border border = BorderFactory.createLineBorder(Color.black, 1);
+    Color colorbg = Color.decode("#212f3d"); // Color de fondo para los paneles internos (paneles de botones, etc.)
+    Color colorButton = Color.decode("#006D77"); // Color de los botones
+    Color panelColor = Color.decode("#F4D35E"); // Color de fondo del panel envolvente
 
-	public PanelAdmin(PanelImagen panelImagen) {
-		this.panelImagen = panelImagen;
-		propiedades();
-		contenidos();
-	}
+    // CardLayout para el panel infoPanel
+    private CardLayout cardLayout = new CardLayout();
+    private JPanel infoPanel; // Declarar infoPanel como una variable de clase para poder hacer referencia a ella más adelante
 
-	private void propiedades() {
-		// Establecer el tamaño preferido del panel
-		this.setBackground(colorbg);
-		this.setPreferredSize(new Dimension(700, 600));
-	}
+    public PanelAdmin(PanelImagen panelImagen) {
+        this.panelImagen = panelImagen;
+        setLayout(new BorderLayout());
+        propiedades();
+        contenidos();
+    }
 
-	private void contenidos() {
+    private void propiedades() {
+        this.setBackground(colorbg);
+        this.setPreferredSize(new Dimension(800, 650));
+    }
 
-		// Panel de título
-		JPanel tittlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JLabel title = new JLabel("ADMIN");
-		title.setFont(new Font("Arial", Font.BOLD, 35));
-		title.setForeground(Color.decode("#F4D35E"));
-		tittlePanel.setBackground(colorbg);
-		tittlePanel.setPreferredSize(new Dimension(700, 100));
-		tittlePanel.add(title);
-		this.add(tittlePanel, BorderLayout.NORTH);
+    private void contenidos() {
+        // Panel Wrapper para controlar el tamaño
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setPreferredSize(new Dimension(800, 650));
+        wrapperPanel.setBackground(panelColor); // El panel wrapper tiene el color claro (#F4D35E)
 
-		// Panel central con GridBagLayout
-		JPanel gridbagpanel = new JPanel(new GridBagLayout());
-		gridbagpanel.setPreferredSize(new Dimension(700, 300));
-		gridbagpanel.setBackground(colorbg);
+        // Panel de Etiqueta (Norte)
+        JPanel labelPanel = new JPanel();
+        labelPanel.setBackground(colorbg); // Establecer el color de fondo a #212f3d
+        JLabel label = new JLabel("ADMIN", SwingConstants.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 35));
+        label.setForeground(Color.decode("#F4D35E"));
+        labelPanel.setPreferredSize(new Dimension(800, 100));
+        labelPanel.add(label);
 
-		// Crear GridBagConstraints para colocar los botones en la cuadrícula
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(10, 10, 10, 10); // Añadir espacio entre los botones
-		gbc.fill = GridBagConstraints.BOTH; // Hacer que los botones se expandan horizontal y verticalmente
-		gbc.weightx = 1.0; // Permitir expansión horizontal
-		gbc.weighty = 1.0; // Permitir expansión vertical
+        // Panel de Contenido (Centro)
+        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBackground(colorbg); // Establecer el color de fondo a #212f3d
 
-		// Primera fila, primer botón
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		JButton botn1 = new JButton("Gestionar Empleados");
-		stylePanelButton(botn1);
-		gridbagpanel.add(botn1, gbc);
+        // Añadir un padding de 10px a contentPanel (arriba, derecha, abajo, izquierda)
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding de 10px en todos los lados
 
-		// Primera fila, segundo botón
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		JButton botn2 = new JButton("Gestionar Pacientes");
-		stylePanelButton(botn2);
-		gridbagpanel.add(botn2, gbc);
+        // Panel Opcion (Oeste)
+        JPanel opcionPanel = new JPanel(new GridLayout(5, 5, 10, 10)); // Establecer el espacio entre botones
+        opcionPanel.setPreferredSize(new Dimension(230, 550));
+        opcionPanel.setBackground(colorbg); // Establecer el color de fondo a #212f3d
 
-		// Segunda fila, primer botón
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		JButton botn3 = new JButton("Gestionar Salas");
-		stylePanelButton(botn3);
-		gridbagpanel.add(botn3, gbc);
+        // Panel Info (Centro) con CardLayout
+        infoPanel = new JPanel(cardLayout);
+        infoPanel.setBackground(Color.WHITE); // Establecer el color de fondo a blanco (para cambios dinámicos)
 
-		// Segunda fila, segundo botón
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		JButton botn4 = new JButton("Estadísticas");
-		stylePanelButton(botn4);
-		gridbagpanel.add(botn4, gbc);
+        // Botones para el Panel Opcion
+        String[] buttonLabels = {"Gestionar Empleados", "Gestionar Pacientes", "Gestionar Salas", "Estadísticas", "|| Cerrar Sesión ||"};
+        for (String buttonLabel : buttonLabels) {
+            JButton button = new JButton(buttonLabel);
+            stylePanelButton(button);
+           
+            if (buttonLabel.equals("|| Cerrar Sesión ||")) {
+            	button.setBackground(Color.white);
+            	button.setForeground(Color.black);
+                cambiarAlInicio(button);
+            } else {
+                // Acción de botón para otros botones
+                button.addActionListener(e -> {
+                    switchPanel(buttonLabel); // Cambiar al panel correspondiente
+                });
+            }
+            opcionPanel.add(button);
+        }
+        
 
-		this.add(gridbagpanel, BorderLayout.CENTER);
+        // Paneles de Información para el CardLayout
+        for (int i = 1; i <= 5; i++) {
+            JPanel panel = new JPanel(new BorderLayout()); // Usar BorderLayout para más control sobre los componentes
+            panel.setBackground(Color.WHITE); // Los paneles de información tienen el fondo blanco inicialmente
+            JLabel panelLabel = new JLabel("Info Panel " + i);
+            panelLabel.setHorizontalAlignment(SwingConstants.CENTER); // Centrar la etiqueta
+            panelLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+            panel.add(panelLabel, BorderLayout.CENTER); // Añadir la etiqueta en el centro
 
-		// Panel de botones (parte inferior)
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-		buttonPanel.setPreferredSize(new Dimension(700, 200));
-		JButton botnInicio = new JButton("||  Cerrar Sesión  ||");
-		buttonPanel.setBackground(colorbg);
-		stylePanelButton(botnInicio);
-		botnInicio.setPreferredSize(new Dimension(300, 75));
-		botnInicio.setBackground(Color.white);
-		botnInicio.setForeground(Color.black);
-		buttonPanel.add(botnInicio);
-		this.add(buttonPanel, BorderLayout.SOUTH);
-		cambiarAlInicio(botnInicio);
-	}
+            infoPanel.add(panel, "Panel" + i); // Añadir cada panel de información al CardLayout
+        }
 
-	private void cambiarAlInicio(JButton button) {
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				panelImagen.cambiarPanel(new PanelLogin(panelImagen));
-			}
-		});
-	}
+        // Añadir espacio entre el opcionPanel y el infoPanel (espacio de 10px)
+        JPanel spacer = new JPanel();
+        spacer.setPreferredSize(new Dimension(10, 1)); // Crear un pequeño panel de espacio con un ancho de 10px
+        spacer.setBackground(colorbg); // Establecer el color de fondo para que coincida con el color principal
+        
+        contentPanel.add(opcionPanel, BorderLayout.WEST);
+        contentPanel.add(spacer, BorderLayout.CENTER); // Añadir el espacio entre los paneles
+        contentPanel.add(infoPanel, BorderLayout.CENTER);
 
-	private void stylePanelButton(JButton button) {
-		button.setBackground(colorButton);
-		button.setForeground(Color.white);
-		button.setFont(new Font("Arial", Font.BOLD, 25));
-		button.setFocusPainted(false);
-		button.setBorder(border);
-	}
+        // Añadir algo de espacio en la parte inferior del contentPanel
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0)); // Añadir un padding en la parte inferior
+
+        wrapperPanel.add(labelPanel, BorderLayout.NORTH);
+        wrapperPanel.add(contentPanel, BorderLayout.CENTER);
+
+        this.add(wrapperPanel, BorderLayout.CENTER);
+
+        // Refrescar el diseño
+        revalidate();
+        repaint();
+    }
+
+    private void cambiarAlInicio(JButton button) {
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                button.setBackground(Color.decode("#FF6347")); // Cambiar color al hacer clic
+                panelImagen.cambiarPanel(new PanelLogin(panelImagen));
+            }
+        });
+    }
+
+    // Cambiar entre los paneles de información según el botón presionado
+    private void switchPanel(String buttonLabel) {
+        // Mapear los nombres de los botones a los nombres de los paneles
+        String panelName = "";
+        switch (buttonLabel) {
+            case "Gestionar Empleados":
+                panelName = "Panel1"; // Panel correspondiente a "Gestionar Empleados"
+                break;
+            case "Gestionar Pacientes":
+                panelName = "Panel2"; // Panel correspondiente a "Gestionar Pacientes"
+                break;
+            case "Gestionar Salas":
+                panelName = "Panel3"; // Panel correspondiente a "Gestionar Salas"
+                break;
+            case "Estadísticas":
+                panelName = "Panel4"; // Panel correspondiente a "Estadísticas"
+                break;
+            default:
+                panelName = "Panel5"; // Panel por defecto para "Cerrar Sesión"
+                break;
+        }
+
+        // Ahora mostrar el panel correcto basado en el nombre
+        cardLayout.show(infoPanel, panelName);
+    }
+
+    private void stylePanelButton(JButton button) {
+        button.setBackground(colorButton);
+        button.setForeground(Color.white);
+        button.setFont(new Font("Arial", Font.BOLD, 25));
+        button.setFocusPainted(false);
+        button.setBorder(border);
+    }
 }
