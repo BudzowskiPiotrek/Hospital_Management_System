@@ -23,7 +23,7 @@ public class PanelRegistrar extends JPanel {
         // === Título ===
         JLabel titleLabel = new JLabel("REGISTRAR", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 26));
-        titleLabel.setForeground(Color.orange);
+        titleLabel.setForeground(Color.decode("#F4D35E"));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(titleLabel, BorderLayout.NORTH);
 
