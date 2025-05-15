@@ -1,9 +1,7 @@
 package gestionHospital;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
 
 public class PanelRecetarMedicacion extends JPanel {
 
@@ -19,11 +17,10 @@ public class PanelRecetarMedicacion extends JPanel {
     }
 
     private Color colorbg = Color.decode("#212f3d"); // Color de fondo para el panel
-    private JTextField textFieldPaciente, textFieldMedicamento, textFieldDosis, textFieldFrecuencia;
-    private JTextArea textAreaInstrucciones;
+    private JTextField textFieldPaciente, textFieldMedicamento, textFieldObservaciones;
 
     public PanelRecetarMedicacion() {
-        // Constructor logic if needed
+        initComponents();
     }
 
     public JPanel createPanel() {
@@ -34,86 +31,70 @@ public class PanelRecetarMedicacion extends JPanel {
     }
 
     private void initComponents() {
-        // Titulo del panel
+        this.setLayout(new BorderLayout());
+        this.setBackground(colorbg);
+
+        // Título
         JLabel titulo = new JLabel("Recetar Medicación", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
         titulo.setForeground(Color.WHITE);
         titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(titulo, BorderLayout.NORTH);
+        this.add(titulo, BorderLayout.NORTH);
 
         // Panel de formulario
-        JPanel formularioPanel = new JPanel();
-        formularioPanel.setLayout(new GridLayout(6, 2, 10, 10)); // 6 filas, 2 columnas
+        JPanel formularioPanel = new JPanel(new GridBagLayout());
         formularioPanel.setBackground(colorbg);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
 
-        // Campos del formulario
+        // ID Paciente
+        gbc.gridx = 0; gbc.gridy = 0;
         JLabel lblPaciente = new JLabel("ID Paciente:");
         lblPaciente.setForeground(Color.WHITE);
-        textFieldPaciente = new JTextField();
+        formularioPanel.add(lblPaciente, gbc);
 
+        gbc.gridx = 1;
+        textFieldPaciente = new JTextField();
+        textFieldPaciente.setPreferredSize(new Dimension(200, 30));
+        formularioPanel.add(textFieldPaciente, gbc);
+
+        // Medicamento
+        gbc.gridx = 0; gbc.gridy = 1;
         JLabel lblMedicamento = new JLabel("Medicamento:");
         lblMedicamento.setForeground(Color.WHITE);
+        formularioPanel.add(lblMedicamento, gbc);
+
+        gbc.gridx = 1;
         textFieldMedicamento = new JTextField();
+        textFieldMedicamento.setPreferredSize(new Dimension(200, 30));
+        formularioPanel.add(textFieldMedicamento, gbc);
 
-        JLabel lblDosis = new JLabel("Dosis:");
-        lblDosis.setForeground(Color.WHITE);
-        textFieldDosis = new JTextField();
-
-        JLabel lblFrecuencia = new JLabel("Frecuencia (días/semana):");
-        lblFrecuencia.setForeground(Color.WHITE);
-        textFieldFrecuencia = new JTextField();
-
-        JLabel lblInstrucciones = new JLabel("Instrucciones:");
-        lblInstrucciones.setForeground(Color.WHITE);
-        textAreaInstrucciones = new JTextArea(5, 20);
-        textAreaInstrucciones.setLineWrap(true);
-        textAreaInstrucciones.setWrapStyleWord(true);
-        textAreaInstrucciones.setBackground(colorbg);
-        textAreaInstrucciones.setForeground(Color.WHITE);
-        textAreaInstrucciones.setFont(new Font("Arial", Font.PLAIN, 14));
-        JScrollPane scrollInstrucciones = new JScrollPane(textAreaInstrucciones);
-
-        // Botón de guardar receta
+        // Botón guardar
+        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
         JButton btnGuardar = new JButton("Guardar Receta");
         btnGuardar.setBackground(Color.decode("#006D77"));
         btnGuardar.setForeground(Color.WHITE);
         btnGuardar.setFont(new Font("Arial", Font.BOLD, 14));
         btnGuardar.setFocusPainted(false);
-        btnGuardar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                guardarReceta();
-            }
-        });
+        btnGuardar.setPreferredSize(new Dimension(180, 35));
+        btnGuardar.addActionListener(e -> guardarReceta());
+        formularioPanel.add(btnGuardar, gbc);
 
-        // Agregar los componentes al formulario
-        formularioPanel.add(lblPaciente);
-        formularioPanel.add(textFieldPaciente);
-        formularioPanel.add(lblMedicamento);
-        formularioPanel.add(textFieldMedicamento);
-        formularioPanel.add(lblDosis);
-        formularioPanel.add(textFieldDosis);
-        formularioPanel.add(lblFrecuencia);
-        formularioPanel.add(textFieldFrecuencia);
-        formularioPanel.add(lblInstrucciones);
-        formularioPanel.add(scrollInstrucciones);
-        formularioPanel.add(new JLabel()); // Filler label para alinear el botón
-        formularioPanel.add(btnGuardar);
-
-        // Añadir formulario al panel principal
-        add(formularioPanel, BorderLayout.CENTER);
+        this.add(formularioPanel, BorderLayout.CENTER);
     }
 
     // Acción para guardar la receta
     private void guardarReceta() {
         String pacienteID = textFieldPaciente.getText().trim();
         String medicamento = textFieldMedicamento.getText().trim();
-        String dosis = textFieldDosis.getText().trim();
-        String frecuencia = textFieldFrecuencia.getText().trim();
-        String instrucciones = textAreaInstrucciones.getText().trim();
+        String dosis = textFieldObservaciones.getText().trim();
 
         // Validate input fields
-        if (pacienteID.isEmpty() || medicamento.isEmpty() || dosis.isEmpty() || frecuencia.isEmpty()) {
+        if (pacienteID.isEmpty() || medicamento.isEmpty() || dosis.isEmpty() ) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

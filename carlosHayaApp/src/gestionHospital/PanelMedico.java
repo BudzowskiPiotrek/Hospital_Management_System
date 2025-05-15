@@ -61,7 +61,7 @@ public class PanelMedico extends JPanel {
         infoPanel.setBackground(Color.WHITE); // Establecer el color de fondo a blanco (para cambios dinámicos)
 
         // Botones para el Panel Opcion
-        String[] buttonLabels = { "Ver pacientes asignados", "Historial médico", "Registrar diagnostico", "Recetar medicación",
+        String[] buttonLabels = { "Ver pacientes asignados", "Historial medico", "Registrar diagnostico", "Recetar medicacion",
                 "|| Cerrar Sesión ||" };
         for (String buttonLabel : buttonLabels) {
             JButton button = new JButton(buttonLabel);
@@ -129,13 +129,13 @@ public class PanelMedico extends JPanel {
             case "Ver pacientes asignados":
                 panelName = "Panel1"; // Panel correspondiente a "Ver Pacientes Asignados"
                 break;
-            case "Ver historial médico":
+            case "Historial medico":
                 panelName = "Panel2"; // Panel correspondiente a "Ver/Agregar Historial Médico"
                 break;
             case "Registrar diagnostico":
                 panelName = "Panel3"; // Panel correspondiente a "Registrar Diagnóstico"
                 break;
-            case "Recetar medicación":
+            case "Recetar medicacion":
                 panelName = "Panel4"; // Panel correspondiente a "Recetar Medicación"
                 break;
             default:

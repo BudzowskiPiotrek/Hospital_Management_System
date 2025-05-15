@@ -117,6 +117,9 @@ public class PanelLogin extends JPanel {
 		case "admin":
 			panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
 			break;
+		case "mantenimiento":
+			panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
+			break;
 		 default:
 			 JOptionPane.showMessageDialog(null, "Error: Introduce un usuario Valido!!");
 			 break;
