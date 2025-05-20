@@ -32,7 +32,7 @@ public class PanelVerReportes extends JPanel {
         this.add(titulo, BorderLayout.NORTH);
 
         // Columnas de la tabla para mostrar las estadísticas basadas en el ERD
-        String[] columnas = { "Métrica", "Cantidad" };
+        String[] columnas = { "Tipo De Dato", "Cantidad" };
 
         // Datos de ejemplo de las estadísticas, basados en el ERD
         Object[][] datos = {
