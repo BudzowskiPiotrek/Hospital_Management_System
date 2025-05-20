@@ -255,12 +255,12 @@ public class PanelAdmin extends JPanel {
         filtroPanel.add(textFieldFiltro);
 
         JButton btnBuscar = new JButton("Buscar");
-        btnBuscar.setBackground(Color.decode("#008000")); // Nuevo color de fondo (era el color del panel)
+        btnBuscar.setBackground(Color.decode("#679267")); // Nuevo color de fondo (era el color del panel)
         btnBuscar.setForeground(Color.white); // Asegurar la legibilidad del texto (era gris oscuro)
         btnBuscar.setFont(new Font("Arial", Font.BOLD, 15)); // Mantener la fuente
         btnBuscar.setFocusPainted(false);
-        btnBuscar.setBorder(BorderFactory.createLineBorder(Color.decode("#0056b3"), 1));
-        btnBuscar.setPreferredSize(new Dimension(85, 30));
+        btnBuscar.setBorder(BorderFactory.createLineBorder(Color.decode("#679267"), 1));
+        btnBuscar.setPreferredSize(new Dimension(85, 25));
         filtroPanel.add(btnBuscar);
 
         panel.add(filtroPanel, BorderLayout.SOUTH);
