@@ -1,23 +1,13 @@
 package gestionHospital;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.border.EmptyBorder;
-import javax.swing.SwingConstants;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public class PanelAdmin extends JPanel {
@@ -36,6 +26,12 @@ public class PanelAdmin extends JPanel {
     private JPanel panelGestionPacientes;
     private JPanel panelGestionSalas;
     private JPanel panelVerReportes;
+
+    // Componentes para el panel de Ver Reportes (Estadísticas)
+    private JTable tablaEstadisticas;
+    private DefaultTableModel modeloEstadisticas;
+    private JTextField textFieldFiltro; // Campo para filtrar (si es necesario)
+    private TableRowSorter<DefaultTableModel> sorterEstadisticas;
 
     public PanelAdmin(PanelImagen panelImagen) {
         this.panelImagen = panelImagen;
@@ -90,7 +86,7 @@ public class PanelAdmin extends JPanel {
             });
 
             if (buttonLabels[i].equals("Cerrar Sesión")) {
-                button.setBackground(Color.decode("#CD7F32"));
+                button.setBackground(Color.decode("#C08080"));
                 button.setForeground(Color.white);
             }
         }
@@ -134,7 +130,7 @@ public class PanelAdmin extends JPanel {
 
         JLabel titulo = new JLabel("Gestión de Empleados", SwingConstants.CENTER); // Centrar el texto del título
         titulo.setFont(new Font("Arial", Font.BOLD, 30));
-        titulo.setForeground(Color.DARK_GRAY);
+        titulo.setForeground(Color.darkGray);
         titulo.setBorder(new EmptyBorder(20, 0, 20, 0)); // Añadir un poco de espacio alrededor del título
         panel.add(titulo, BorderLayout.NORTH);
 
@@ -161,7 +157,7 @@ public class PanelAdmin extends JPanel {
 
     // Nuevo método para el estilo de los botones dentro de Gestión
     private void stylePanelButtonGestion(JButton button) {
-        button.setBackground(Color.decode("#F08080")); // Nuevo color de fondo (era el color del panel)
+        button.setBackground(Color.decode("#CD7F32")); // Nuevo color de fondo (era el color del panel)
         button.setForeground(Color.white); // Asegurar la legibilidad del texto (era gris oscuro)
         button.setFont(new Font("Arial", Font.BOLD, 25)); // Mantener la fuente
         button.setFocusPainted(false);
@@ -172,11 +168,11 @@ public class PanelAdmin extends JPanel {
     // Nuevo método para el panel de gestión de pacientes
     private JPanel crearPanelGestionPacientes() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.decode("#B0E0E6")); // Nuevo color de fondo
+        panel.setBackground(Color.decode("#B0E0E6"));// Nuevo color de fondo
 
         JLabel titulo = new JLabel("Gestión de Pacientes", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 30));
-        titulo.setForeground(Color.DARK_GRAY);
+        titulo.setForeground(Color.darkGray);
         titulo.setBorder(new EmptyBorder(20, 0, 20, 0));
         panel.add(titulo, BorderLayout.NORTH);
 
@@ -208,7 +204,7 @@ public class PanelAdmin extends JPanel {
 
         JLabel titulo = new JLabel("Gestión de Salas", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 30));
-        titulo.setForeground(Color.DARK_GRAY);
+        titulo.setForeground(Color.darkGray);
         titulo.setBorder(new EmptyBorder(20, 0, 20, 0));
         panel.add(titulo, BorderLayout.NORTH);
 
@@ -233,70 +229,95 @@ public class PanelAdmin extends JPanel {
         return panel;
     }
 
-    // Nuevo método para el panel de Ver Reportes (con scroll y mejor formato)
+    // Nuevo método para el panel de Ver Reportes (Estadísticas) usando una tabla
     private JPanel crearPanelVerReportes() {
-        JPanel panelContenido = new JPanel();
-        panelContenido.setLayout(new BoxLayout(panelContenido, BoxLayout.Y_AXIS));
-        panelContenido.setBackground(Color.decode("#ECF0F1")); // Un color claro para el fondo del contenido
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.red);
 
-        JLabel titulo = new JLabel("Reportes y Estadísticas", SwingConstants.CENTER); // Título centrado
-        titulo.setFont(new Font("Arial", Font.BOLD, 30));
-        titulo.setForeground(Color.DARK_GRAY);
-        titulo.setBorder(new EmptyBorder(20, 20, 20, 20));
-        panelContenido.add(titulo);
-        panelContenido.add(new JLabel("--------------------------------------------------")); // Línea separadora
+        JLabel titulo = new JLabel("Estadísticas Generales", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setForeground(Color.WHITE);
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        panel.add(titulo, BorderLayout.NORTH);
 
-        Font fuenteReporteTitulo = new Font("Arial", Font.BOLD, 18);
-        Font fuenteReporteDetalle = new Font("Arial", Font.PLAIN, 16);
-        EmptyBorder bordeReporte = new EmptyBorder(10, 20, 10, 20);
+        // Panel para el filtro (si es necesario en el futuro)
+        JPanel filtroPanel = new JPanel();
+        filtroPanel.setBackground(colorbg);
+        filtroPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
-        // Agregar información de prueba (simulando estadísticas)
-        for (int i = 1; i <= 10; i++) { // Reducimos la cantidad para mejor visualización
-            JPanel reportePanel = new JPanel(new GridLayout(0, 2, 10, 5)); // GridLayout para dos columnas
-            reportePanel.setBackground(Color.decode("#ECF0F1"));
-            reportePanel.setBorder(bordeReporte);
+        JLabel lblFiltro = new JLabel("Filtrar por:"); // Etiqueta para el campo de filtro
+        lblFiltro.setForeground(Color.WHITE);
+        lblFiltro.setFont(new Font("Arial", Font.BOLD, 18)); // Aumentar tamaño de "Filtrar por:"
+        filtroPanel.add(lblFiltro);
 
-            JLabel tituloReporte = new JLabel("Reporte " + i + ":");
-            tituloReporte.setFont(fuenteReporteTitulo);
-            reportePanel.add(tituloReporte);
-            reportePanel.add(new JLabel()); // Espacio en blanco para la alineación
+        textFieldFiltro = new JTextField(15); // Aumentar el tamaño del campo de texto
+        textFieldFiltro.setFont(new Font("Arial", Font.PLAIN, 14));
+        filtroPanel.add(textFieldFiltro);
 
-            JLabel pacientesAtendidosLabel = new JLabel("Pacientes Atendidos:");
-            pacientesAtendidosLabel.setFont(fuenteReporteDetalle);
-            reportePanel.add(pacientesAtendidosLabel);
-            JLabel pacientesAtendidosValor = new JLabel(String.valueOf((int) (Math.random() * 100)));
-            pacientesAtendidosValor.setFont(fuenteReporteDetalle);
-            reportePanel.add(pacientesAtendidosValor);
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBackground(Color.decode("#008000")); // Nuevo color de fondo (era el color del panel)
+        btnBuscar.setForeground(Color.white); // Asegurar la legibilidad del texto (era gris oscuro)
+        btnBuscar.setFont(new Font("Arial", Font.BOLD, 15)); // Mantener la fuente
+        btnBuscar.setFocusPainted(false);
+        btnBuscar.setBorder(BorderFactory.createLineBorder(Color.decode("#0056b3"), 1));
+        btnBuscar.setPreferredSize(new Dimension(85, 30));
+        filtroPanel.add(btnBuscar);
 
-            JLabel ingresosLabel = new JLabel("Ingresos Totales:");
-            ingresosLabel.setFont(fuenteReporteDetalle);
-            reportePanel.add(ingresosLabel);
-            JLabel ingresosValor = new JLabel("$" + String.format("%.2f", Math.random() * 1000));
-            ingresosValor.setFont(fuenteReporteDetalle);
-            reportePanel.add(ingresosValor);
+        panel.add(filtroPanel, BorderLayout.SOUTH);
 
-            JLabel empleadosActivosLabel = new JLabel("Empleados Activos:");
-            empleadosActivosLabel.setFont(fuenteReporteDetalle);
-            reportePanel.add(empleadosActivosLabel);
-            JLabel empleadosActivosValor = new JLabel(String.valueOf((int) (Math.random() * 20)));
-            empleadosActivosValor.setFont(fuenteReporteDetalle);
-            reportePanel.add(empleadosActivosValor);
+        // Columnas de la tabla para mostrar las estadísticas
+        String[] columnas = { "Estadística", "Valor" };
 
-            panelContenido.add(reportePanel);
-            panelContenido.add(new JLabel("--------------------------------------------------")); // Otra línea
-        }
+        // Datos de ejemplo de las estadísticas
+        Object[][] datos = {
+                { "Pacientes Atendidos Hoy", 85 },
+                { "Ingresos Totales del Mes", "$125,000" },
+                { "Promedio de Citas por Día", 32.5 },
+                { "Ocupación de Camas", "75%" },
+                { "Empleados Activos", 55 }
+        };
 
-        JScrollPane scrollPane = new JScrollPane(panelContenido);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        modeloEstadisticas = new DefaultTableModel(datos, columnas) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // No editable
+            }
+        };
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout());
-        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
+        tablaEstadisticas = new JTable(modeloEstadisticas);
+        tablaEstadisticas.setFont(new Font("Arial", Font.PLAIN, 14));
+        tablaEstadisticas.setRowHeight(25);
+        tablaEstadisticas.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
 
-        return panelPrincipal;
+        sorterEstadisticas = new TableRowSorter<>(modeloEstadisticas);
+        tablaEstadisticas.setRowSorter(sorterEstadisticas);
+
+        JScrollPane scrollPane = new JScrollPane(tablaEstadisticas);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Acción del botón buscar (adaptado para estadísticas)
+        btnBuscar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                filtrarTablaEstadisticas();
+            }
+        });
+
+        return panel;
     }
 
-    @SuppressWarnings("unused")
+    private void filtrarTablaEstadisticas() {
+        String filtro = textFieldFiltro.getText().trim();
+        if (filtro.isEmpty()) {
+            sorterEstadisticas.setRowFilter(null);
+        } else {
+            // Adaptar el filtro según las columnas de la tabla de estadísticas
+            sorterEstadisticas.setRowFilter(RowFilter.regexFilter(filtro, 0)); // Filtra por la columna "Estadística"
+        }
+    }
+
     private JPanel crearPanel(String texto) {
         JPanel panel = new JPanel();
         panel.setBackground(Color.decode("#F08080")); // Un color diferente para distinguirlos
