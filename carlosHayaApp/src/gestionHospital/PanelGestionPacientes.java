@@ -25,7 +25,7 @@ public class PanelGestionPacientes extends JPanel {
 
   private Color gestionButtonBgColor = Color.decode("#CD7F32"); // Color de fondo de los botones de gestión
   private Color gestionButtonFgColor = Color.white; // Color de texto de los botones de gestión
-  private Font gestionButtonFont = new Font("Arial", Font.BOLD, 15); // Fuente de los botones de gestión
+  private Font gestionButtonFont = new Font("Arial", Font.BOLD, 11); // Fuente de los botones de gestión
   private Border gestionButtonBorder = BorderFactory.createLineBorder(Color.decode("#CD7F32"), 1); // Borde de los
                                                                                                    // botones de gestión
 
@@ -83,9 +83,15 @@ public class PanelGestionPacientes extends JPanel {
     styleGestionButton(btnEditar);
     JButton btnEliminar = new JButton("Eliminar Paciente");
     styleGestionButton(btnEliminar);
+    JButton btnAgreagrHistorial = new JButton("Agregar Historial");
+    styleGestionButton(btnAgreagrHistorial);
+    JButton btnAsignarHabitacion = new JButton("Asignar Habitacion");
+    styleGestionButton(btnAsignarHabitacion);
     panelBotonesTablaPacientes.add(btnRegistrar);
     panelBotonesTablaPacientes.add(btnEditar);
     panelBotonesTablaPacientes.add(btnEliminar);
+    panelBotonesTablaPacientes.add(btnAgreagrHistorial);
+    panelBotonesTablaPacientes.add(btnAsignarHabitacion);
     panelTablaPacientesLocal.add(panelBotonesTablaPacientes, BorderLayout.SOUTH);
 
     // --- Vista de Formulario de Paciente ---
@@ -268,6 +274,6 @@ public class PanelGestionPacientes extends JPanel {
     button.setFont(gestionButtonFont);
     button.setFocusPainted(false);
     button.setBorder(gestionButtonBorder);
-    button.setPreferredSize(new Dimension(180, 45));
+    button.setPreferredSize(new Dimension(115, 35));
   }
 }

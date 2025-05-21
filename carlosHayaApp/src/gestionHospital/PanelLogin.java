@@ -93,7 +93,7 @@ public class PanelLogin extends JPanel {
 		botonesPanel.add(registrarButton);
 
 		// Añadir todo al panel principal
-		setLayout(new GridLayout(4, 1,30, 30));
+		setLayout(new GridLayout(4, 1, 30, 30));
 		add(titlePanel);
 		add(usuarioPanel);
 		add(contrasenaPanel);
@@ -111,19 +111,12 @@ public class PanelLogin extends JPanel {
 
 	private void switchParaCambiarPanel(String usuario, String contrasena) {
 		switch (usuario) {
-		case "medico":
-			panelImagen.cambiarPanel(new PanelMedico(panelImagen));
-			break;
-		case "admin":
-			panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
-			break;
-		case "mantenimiento":
-			panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
-			break;
-		 default:
-			 JOptionPane.showMessageDialog(null, "Error: Introduce un usuario Valido!!");
-			 break;
-			
+			case "admin":
+				panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
+				break;
+			default:
+				JOptionPane.showMessageDialog(null, "Error: Introduce un usuario Valido!!");
+				break;
 
 		}
 	}

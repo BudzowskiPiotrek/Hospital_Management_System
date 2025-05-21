@@ -26,7 +26,6 @@ public class PanelAdmin extends JPanel {
     private PanelGestionEmpleados panelGestionEmpleados;
     private PanelGestionPacientes panelGestionPacientes;
     private PanelGestionSalas panelGestionSalas;
-    private PanelVerReportes panelVerReportes;
 
     public PanelAdmin(PanelImagen panelImagen) {
         this.panelImagen = panelImagen;
@@ -38,9 +37,7 @@ public class PanelAdmin extends JPanel {
         panelTitle(); // Inicializa y añade el panel del título
         panelMenuYdisplay(); // Inicializa y organiza el menú y el área de visualización
 
-        // Muestra el panel de estadísticas como panel predeterminado al iniciar la
-        // aplicación
-        mostrarPanel(panelVerReportes);
+        mostrarPanel(panelGestionEmpleados);
     }
 
     /**
@@ -59,13 +56,13 @@ public class PanelAdmin extends JPanel {
      * Configura el panel del menú izquierdo con botones de navegación.
      */
     private void panelIzquierda() {
-        panelMenu = new JPanel(new GridLayout(5, 1, 5, 5)); // GridLayout para 5 botones en columna
+        panelMenu = new JPanel(new GridLayout(5, 1, 45, 10)); // GridLayout para 5 botones en columna
         panelMenu.setPreferredSize(new Dimension(200, 500)); // Tamaño preferido del menú
         panelMenu.setBackground(colorbg); // Color de fondo del menú
         panelMenu.setBorder(new EmptyBorder(0, 0, 0, 10)); // Borde derecho para espaciado
         panelMedio.add(panelMenu, BorderLayout.WEST); // Añade el menú a la izquierda del panel medio
 
-        String[] buttonLabels = { "Gestionar Empleados", "Gestionar Pacientes", "Gestionar Salas", "Estadísticas",
+        String[] buttonLabels = { "Gestionar Empleados", "Gestionar Pacientes", "Gestionar Salas",
                 "Cerrar Sesión" };
 
         for (int i = 0; i < buttonLabels.length; i++) {
@@ -85,8 +82,6 @@ public class PanelAdmin extends JPanel {
                         mostrarPanel(panelGestionPacientes);
                     } else if (label.equals("Gestionar Salas")) {
                         mostrarPanel(panelGestionSalas);
-                    } else if (label.equals("Estadísticas")) {
-                        mostrarPanel(panelVerReportes);
                     } else if (label.equals("Cerrar Sesión")) {
                         button.setBackground(Color.decode("#FF6347")); // Color especial para "Cerrar Sesión" al hacer
                                                                        // clic
@@ -115,7 +110,7 @@ public class PanelAdmin extends JPanel {
         panelGestionEmpleados = new PanelGestionEmpleados();
         panelGestionPacientes = new PanelGestionPacientes();
         panelGestionSalas = new PanelGestionSalas();
-        panelVerReportes = new PanelVerReportes();
+
     }
 
     /**
@@ -147,8 +142,7 @@ public class PanelAdmin extends JPanel {
 
     /**
      * Muestra el panel especificado en el área de visualización principal
-     * (panelDisplay).
-     * Elimina cualquier componente anterior y añade el nuevo panel.
+     * (panelDisplay). Elimina cualquier componente anterior y añade el nuevo panel.
      * 
      * @param panel El JPanel a mostrar.
      */

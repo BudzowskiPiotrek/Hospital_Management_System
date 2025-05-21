@@ -24,7 +24,7 @@ public class PanelGestionSalas extends JPanel {
 
   private Color gestionButtonBgColor = Color.decode("#CD7F32"); // Color de fondo de los botones de gestión
   private Color gestionButtonFgColor = Color.white; // Color de texto de los botones de gestión
-  private Font gestionButtonFont = new Font("Arial", Font.BOLD, 15); // Fuente de los botones de gestión
+  private Font gestionButtonFont = new Font("Arial", Font.BOLD, 11); // Fuente de los botones de gestión
   private Border gestionButtonBorder = BorderFactory.createLineBorder(Color.decode("#CD7F32"), 1); // Borde de los
                                                                                                    // botones de gestión
 
@@ -51,7 +51,7 @@ public class PanelGestionSalas extends JPanel {
     JPanel panelTablaSalasLocal = new JPanel(new BorderLayout());
     panelTablaSalasLocal.setBackground(cardsPanelBgColor); // Fondo de la tabla (dentro de cardsPanel)
 
-    String[] columnasSalas = { "Número", "Tipo", "Capacidad" };
+    String[] columnasSalas = { "Número", "Tipo", "Capacidad", "Disponibilidad", "Mantenimiento" };
     Object[][] datosSalas = {
         { "101", "Consulta General", 1 },
         { "203", "Quirófano", 5 },
@@ -83,9 +83,15 @@ public class PanelGestionSalas extends JPanel {
     styleGestionButton(btnEditar);
     JButton btnEliminar = new JButton("Eliminar Sala");
     styleGestionButton(btnEliminar);
+    JButton btnConsultarDisponiblilidad = new JButton("Disponibilidad");
+    styleGestionButton(btnConsultarDisponiblilidad);
+    JButton btnMantenimientodelasala = new JButton("Mantenimiento");
+    styleGestionButton(btnMantenimientodelasala);
     panelBotonesTablaSalas.add(btnAgregar);
     panelBotonesTablaSalas.add(btnEditar);
     panelBotonesTablaSalas.add(btnEliminar);
+    panelBotonesTablaSalas.add(btnConsultarDisponiblilidad);
+    panelBotonesTablaSalas.add(btnMantenimientodelasala);
     panelTablaSalasLocal.add(panelBotonesTablaSalas, BorderLayout.SOUTH);
 
     // --- Vista de Formulario de Sala ---
@@ -243,6 +249,6 @@ public class PanelGestionSalas extends JPanel {
     button.setFont(gestionButtonFont);
     button.setFocusPainted(false);
     button.setBorder(gestionButtonBorder);
-    button.setPreferredSize(new Dimension(180, 45));
+    button.setPreferredSize(new Dimension(115, 35));
   }
 }
