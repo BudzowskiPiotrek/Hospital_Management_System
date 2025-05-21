@@ -39,7 +39,7 @@ public class DBConnection {
 	// -------------- GESTION DE LOGIN --------------
 
 	public String iniciarSesion(String dni, String contrasena) {
-		String sql = "SELECT u.rol FROM Usuario u " + "JOIN Empleado e ON u.id = e.usuario_id "
+		String sql = "SELECT u.rol FROM Usuario u " + "JOIN Empleado e ON u.dni = e.usuario_dni "
 				+ "WHERE u.dni = ? AND e.contrasena = ?";
 		try {
 			conectar();
@@ -81,7 +81,8 @@ public class DBConnection {
 				return false;
 			}
 			// POSTERIORMENTE SE INGRESA EN LA TABLA EMPLEADO (USUARIO_ID ES EL DNI)
-			String sqlEmpleado = "INSERT INTO Empleado (usuario_id) VALUES ('" + empleado.getDni() + "')";
+			String sqlEmpleado = "INSERT INTO Empleado (usuario_dni, contrasena) VALUES ('" + empleado.getDni() + "', '"
+					+ empleado.getContrasena() + "')";
 			int filasEmpleado = stmt.executeUpdate(sqlEmpleado);
 
 			return filasEmpleado > 0;
@@ -147,7 +148,7 @@ public class DBConnection {
 			}
 
 			// POSTERIORMENTE SE INGRESA EN LA TABLA PACIENTE (USUARIO_ID ES EL DNI)
-			String sqlPaciente = "INSERT INTO Paciente (usuario_id, contacto, obra_social) VALUES ('"
+			String sqlPaciente = "INSERT INTO Paciente (usuario_dni, contacto, obra_social) VALUES ('"
 					+ paciente.getDni() + "', '" + paciente.getContacto() + "', '" + paciente.getObraSocial() + "')";
 			int filasPaciente = stmt.executeUpdate(sqlPaciente);
 
@@ -173,7 +174,7 @@ public class DBConnection {
 
 			// SEGUNDO SE MODIFICA LA PARTE DE PACIENTE
 			String sqlPaciente = "UPDATE Paciente SET " + "contacto = '" + paciente.getContacto() + "', "
-					+ "obra_social = '" + paciente.getObraSocial() + "' " + "WHERE usuario_id = '" + paciente.getDni()
+					+ "obra_social = '" + paciente.getObraSocial() + "' " + "WHERE usuario_dni = '" + paciente.getDni()
 					+ "'";
 
 			int filasPaciente = stmt.executeUpdate(sqlPaciente);
