@@ -105,7 +105,7 @@ public class PanelLogin extends JPanel {
 		iniciarButton.addActionListener(e -> {
 			String usuario = usuarioField.getText();
 			String contrasena = new String(contrasenaField.getPassword());
-			switchParaCambiarPanel(usuario, contrasena);
+			
 
 
 			DBConnection db = new DBConnection();
@@ -123,13 +123,13 @@ public class PanelLogin extends JPanel {
 
 					break;
 				case "medico":
-					
+					panelImagen.cambiarPanel(new PanelMedico(panelImagen));
 					break;
 				case "enfermero":
 
 					break;
 				case "mantenimiento":
-
+					panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
 					break;
 
 				default:
@@ -137,23 +137,9 @@ public class PanelLogin extends JPanel {
 					break;
 				}
 			}
-
 		});
-
-
 	}
 
-	private void switchParaCambiarPanel(String usuario, String contrasena) {
-		switch (usuario) {
-			case "admin":
-				panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
-				break;
-			default:
-				JOptionPane.showMessageDialog(null, "Error: Introduce un usuario Valido!!");
-				break;
-
-		}
-	}
 
 	// Estilo de los botones
 	private void styleButton(JButton button) {
