@@ -1,8 +1,10 @@
 package clases;
 
 public class Mantenimiento extends Empleado {
-	
-	public Mantenimiento(String nombre,String contrasena, String apellido, String dni) {
-		super(nombre,contrasena, apellido, dni, "mantenimiento");
+
+	public Mantenimiento(int salaId, String nombre, String apellido, String dni, String rol, String contrasena) {
+		super(salaId, nombre, apellido, dni, rol, contrasena);
 	}
+	
+	
 }

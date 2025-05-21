@@ -2,7 +2,8 @@ package clases;
 
 public class Enfermero extends Empleado {
 
-	public Enfermero(String nombre, String contrasena, String apellido, String dni) {
-		super(nombre, contrasena, apellido, dni, "enfermero");
+	public Enfermero(int salaId, String nombre, String apellido, String dni, String rol, String contrasena) {
+		super(salaId, nombre, apellido, dni, rol, contrasena);
 	}
+
 }

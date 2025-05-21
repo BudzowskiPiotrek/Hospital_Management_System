@@ -1,11 +1,15 @@
 package clases;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBConnection {
 
@@ -130,6 +134,90 @@ public class DBConnection {
 			desconectar();
 		}
 	}
+
+	public List<Empleado> obtenerTodosLosEmpleados() {
+		List<Empleado> empleados = new ArrayList<>();
+		conectar();
+
+		String sql = "SELECT u.dni, u.nombre, u.apellido, u.rol, s.id AS sala_id, s.tipo AS sala_tipo "
+				+ "FROM Usuario u JOIN Empleado e ON u.dni = e.usuario_dni LEFT JOIN Sala s ON e.sala_id = s.id "
+				+ "WHERE u.rol IN ('administrativo', 'administrador', 'enfermero', 'mantenimiento', 'medico')";
+		try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+
+			while (rs.next()) {
+				String dni = rs.getString("dni");
+				String nombre = rs.getString("nombre");
+				String apellido = rs.getString("apellido");
+				String rol = rs.getString("rol");
+				String contrasena = null;
+				int salaId = rs.getInt("sala_id");
+				if (rs.wasNull()) {
+					salaId = 0; // Por si aun no tiene asignado ninguna sala
+				}
+				empleados.add(new Empleado(salaId, nombre, apellido, dni, rol, contrasena));
+			}
+		} catch (SQLException e) {
+			System.err.println("Error al obtener empleados: " + e.getMessage());
+		} finally {
+			desconectar();
+		}
+		return empleados;
+	}
+
+	public boolean asignarTurno(String empleadoDni, String pacienteDni, Date dia, Time horaInicio, Time horaFin) {
+		conectar();
+		if (conn == null)
+			return false;
+
+		String sql = "INSERT INTO turno (empleado_dni, paciente_dni, dia, hora_inicio, hora_fin) VALUES (?, ?, ?, ?, ?)";
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, empleadoDni);
+			pstmt.setString(2, pacienteDni);
+			pstmt.setDate(3, dia);
+			pstmt.setTime(4, horaInicio);
+			pstmt.setTime(5, horaFin);
+
+			int filas = pstmt.executeUpdate();
+			if (filas > 0) {
+				System.out.println("Turno asignado exitosamente.");
+			} else {
+				System.err.println("No se pudo asignar el turno.");
+			}
+			return filas > 0;
+		} catch (SQLException e) {
+			System.err.println("Error al asignar turno: " + e.getMessage());
+			return false;
+		} finally {
+			desconectar();
+		}
+	}
+	
+	public boolean asignarSala(String empleadoDni, Integer salaId) {
+        conectar(); 
+        String salaIdValue;
+        if (salaId == null || salaId == 0) { 
+            salaIdValue = "NULL"; 
+        } else {
+            salaIdValue = String.valueOf(salaId); 
+        }
+ 
+        String sql = "UPDATE Empleado SET sala_id = " + salaIdValue + " WHERE usuario_dni = '" + empleadoDni + "'";
+        
+        try (Statement stmt = conn.createStatement()) {
+            int filas = stmt.executeUpdate(sql);
+            if (filas > 0) {
+                System.out.println("Sala asignada/desasignada exitosamente.");
+            } else {
+                System.err.println("No se encontró el empleado para asignar/desasignar sala o no hubo cambios.");
+            }
+            return filas > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al asignar sala: " + e.getMessage());
+            return false;
+        } finally {
+            desconectar(); // Desconectar al finalizar la operación
+        }
+    }
 
 	// -------------- GESTION DE PACIENTE --------------
 

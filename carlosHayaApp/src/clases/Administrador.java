@@ -2,7 +2,9 @@ package clases;
 
 public class Administrador extends Empleado {
 
-	public Administrador(String nombre, String contrasena, String apellido, String dni) {
-		super(nombre, contrasena, apellido, dni, "administrador");
+	public Administrador(int salaId, String nombre, String apellido, String dni, String rol, String contrasena) {
+		super(salaId, nombre, apellido, dni, rol, contrasena);
 	}
+
+	
 }
