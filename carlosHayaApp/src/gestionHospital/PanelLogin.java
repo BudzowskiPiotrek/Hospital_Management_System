@@ -105,7 +105,40 @@ public class PanelLogin extends JPanel {
 			String contrasena = new String(contrasenaField.getPassword());
 			switchParaCambiarPanel(usuario, contrasena);
 
+<<<<<<< Updated upstream
+=======
+			DBConnection db = new DBConnection();
+			String rol = db.iniciarSesion(usuario, contrasena);
+
+			// Llamada a método que devuelve rol o null
+			if (rol == null) {
+				JOptionPane.showMessageDialog(null, "Usuario no encontrado o error en la conexión.");
+			} else {
+				switch (rol) {
+				case "administrador":
+					panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
+					break;
+				case "administrativo":
+
+					break;
+				case "medico":
+					
+					break;
+				case "enfermero":
+
+					break;
+				case "mantenimiento":
+
+					break;
+
+				default:
+					JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rol);
+					break;
+				}
+			}
+>>>>>>> Stashed changes
 		});
+
 
 	}
 
