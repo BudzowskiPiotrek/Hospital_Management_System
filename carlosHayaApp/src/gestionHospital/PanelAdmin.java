@@ -56,14 +56,16 @@ public class PanelAdmin extends JPanel {
      * Configura el panel del menú izquierdo con botones de navegación.
      */
     private void panelIzquierda() {
-        panelMenu = new JPanel(new GridLayout(5, 1, 45, 10)); // GridLayout para 5 botones en columna
-        panelMenu.setPreferredSize(new Dimension(200, 500)); // Tamaño preferido del menú
+        String[] buttonLabels = { "Gestionar Empleados", "Gestionar Pacientes", "Gestionar Salas",
+                "Cerrar Sesión" }; // Definición de las etiquetas de los botones
+
+        // Se ha modificado el GridLayout para que el número de filas coincida con el
+        // número de botones.
+        panelMenu = new JPanel(new GridLayout(buttonLabels.length, 1, 45, 10)); // GridLayout con filas dinámicas
+        panelMenu.setPreferredSize(new Dimension(200, 0)); // Define el ancho preferido, altura flexible
         panelMenu.setBackground(colorbg); // Color de fondo del menú
         panelMenu.setBorder(new EmptyBorder(0, 0, 0, 10)); // Borde derecho para espaciado
         panelMedio.add(panelMenu, BorderLayout.WEST); // Añade el menú a la izquierda del panel medio
-
-        String[] buttonLabels = { "Gestionar Empleados", "Gestionar Pacientes", "Gestionar Salas",
-                "Cerrar Sesión" };
 
         for (int i = 0; i < buttonLabels.length; i++) {
             JButton button = new JButton(buttonLabels[i]);
@@ -126,26 +128,18 @@ public class PanelAdmin extends JPanel {
         this.add(panelTitulo, BorderLayout.NORTH); // Añade el panel de título a la parte superior del PanelAdmin
     }
 
-    /**
-     * Aplica un estilo consistente a los botones del menú izquierdo.
-     * 
-     * @param button El JButton al que se aplicará el estilo.
-     */
     private void stylePanelButton(JButton button) {
         button.setBackground(colorButton); // Color de fondo del botón
         button.setForeground(Color.white); // Color de texto del botón
         button.setFont(new Font("Arial", Font.BOLD, 15)); // Fuente del botón
         button.setFocusPainted(false); // Deshabilita el pintado del foco
         button.setBorder(border); // Borde del botón
-        button.setPreferredSize(new Dimension(180, 40)); // Tamaño preferido del botón
+        // Se ha modificado para que los botones permitan que su altura se ajuste al
+        // espacio disponible en el GridLayout.
+        button.setPreferredSize(new Dimension(180, Short.MAX_VALUE)); // Establece un ancho preferido pero permite que
+                                                                      // la altura se ajuste
     }
 
-    /**
-     * Muestra el panel especificado en el área de visualización principal
-     * (panelDisplay). Elimina cualquier componente anterior y añade el nuevo panel.
-     * 
-     * @param panel El JPanel a mostrar.
-     */
     private void mostrarPanel(JPanel panel) {
         panelDisplay.removeAll(); // Elimina todos los componentes actuales del panelDisplay
         panelDisplay.add(panel, BorderLayout.CENTER); // Añade el nuevo panel al centro
