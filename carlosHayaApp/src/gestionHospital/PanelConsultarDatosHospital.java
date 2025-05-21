@@ -82,13 +82,6 @@ class PanelConsultarDatosHospital extends JPanel {
     loadData("Empleados");
   }
 
-  /**
-   * Método para cargar datos en la tabla según el tipo seleccionado. En una
-   * aplicación real, esto interactuaría con una base de datos o un modelo de
-   * datos.
-   *
-   * @param dataType El tipo de datos a cargar (e.g., "Empleados", "Pacientes").
-   */
   private void loadData(String dataType) {
     tableModel.setRowCount(0); // Limpiar datos existentes
     tableModel.setColumnCount(0); // Limpiar columnas existentes
