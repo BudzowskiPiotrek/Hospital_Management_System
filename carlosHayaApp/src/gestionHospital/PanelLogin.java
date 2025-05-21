@@ -1,11 +1,10 @@
 package gestionHospital;
 
+import clases.DBConnection;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-
-import clases.DBConnection;
 
 public class PanelLogin extends JPanel {
 
@@ -105,8 +104,6 @@ public class PanelLogin extends JPanel {
 		iniciarButton.addActionListener(e -> {
 			String usuario = usuarioField.getText();
 			String contrasena = new String(contrasenaField.getPassword());
-			
-
 
 			DBConnection db = new DBConnection();
 			String rol = db.iniciarSesion(usuario, contrasena);
@@ -116,30 +113,30 @@ public class PanelLogin extends JPanel {
 				JOptionPane.showMessageDialog(null, "Usuario no encontrado o error en la conexión.");
 			} else {
 				switch (rol) {
-				case "administrador":
-					panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
-					break;
-				case "administrativo":
+					case "administrador":
+						panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
+						break;
+					case "administrativo":
+						panelImagen.cambiarPanel(new PanelAdministrativo(panelImagen));
 
-					break;
-				case "medico":
-					panelImagen.cambiarPanel(new PanelMedico(panelImagen));
-					break;
-				case "enfermero":
+						break;
+					case "medico":
+						panelImagen.cambiarPanel(new PanelMedico(panelImagen));
+						break;
+					case "enfermero":
 
-					break;
-				case "mantenimiento":
-					panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
-					break;
+						break;
+					case "mantenimiento":
+						panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
+						break;
 
-				default:
-					JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rol);
-					break;
+					default:
+						JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rol);
+						break;
 				}
 			}
 		});
 	}
-
 
 	// Estilo de los botones
 	private void styleButton(JButton button) {
