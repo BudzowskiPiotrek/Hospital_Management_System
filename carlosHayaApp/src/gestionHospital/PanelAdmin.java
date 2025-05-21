@@ -128,11 +128,6 @@ public class PanelAdmin extends JPanel {
         this.add(panelTitulo, BorderLayout.NORTH); // Añade el panel de título a la parte superior del PanelAdmin
     }
 
-    /**
-     * Aplica un estilo consistente a los botones del menú izquierdo.
-     *
-     * @param button El JButton al que se aplicará el estilo.
-     */
     private void stylePanelButton(JButton button) {
         button.setBackground(colorButton); // Color de fondo del botón
         button.setForeground(Color.white); // Color de texto del botón
@@ -145,12 +140,6 @@ public class PanelAdmin extends JPanel {
                                                                       // la altura se ajuste
     }
 
-    /**
-     * Muestra el panel especificado en el área de visualización principal
-     * (panelDisplay). Elimina cualquier componente anterior y añade el nuevo panel.
-     *
-     * @param panel El JPanel a mostrar.
-     */
     private void mostrarPanel(JPanel panel) {
         panelDisplay.removeAll(); // Elimina todos los componentes actuales del panelDisplay
         panelDisplay.add(panel, BorderLayout.CENTER); // Añade el nuevo panel al centro
