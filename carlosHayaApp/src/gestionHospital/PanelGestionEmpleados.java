@@ -14,9 +14,14 @@ public class PanelGestionEmpleados extends JPanel {
   private JTable tablaEmpleados;
   private JTextField txtNombreEmpleado, txtDNIEmpleado, txtTelefonoEmpleado, txtPuestoEmpleado;
 
-  // New TextFields for Asignar Sala and Asignar Turnos Forms
+  // TextFields for Asignar Sala Forms
   private JTextField txtAsignarSala; // For assigning a room
-  private JTextField txtAsignarTurno; // For assigning a shift
+
+  // JComboBox for assigning shifts in the dedicated form
+  private JComboBox<String> cmbAsignarTurno;
+
+  // NEW: JComboBox for shifts in the general modification form
+  private JComboBox<String> cmbModificarTurno;
 
   private int filaSeleccionadaEmpleado = -1; // Para saber qué fila se está editando
 
@@ -42,6 +47,9 @@ public class PanelGestionEmpleados extends JPanel {
   private Color tableHeaderBg = Color.decode("#f2f2f2"); // Fondo del encabezado de la tabla
   private Color tableHeaderFg = Color.decode("#333"); // Color de texto del encabezado de la tabla
 
+  // TextFields for general modification form (Sala display)
+  private JTextField txtSalaGeneral;
+
   public PanelGestionEmpleados() {
     this.setLayout(new BorderLayout());
     this.setBackground(mainPanelBgColor); // Aplicar el color de fondo principal
@@ -60,7 +68,6 @@ public class PanelGestionEmpleados extends JPanel {
     JPanel panelTablaEmpleadosLocal = new JPanel(new BorderLayout());
     panelTablaEmpleadosLocal.setBackground(cardsPanelBgColor); // Fondo de la tabla (dentro de cardsPanel)
 
-    // MODIFIED: Added "Sala" and "Turno" columns
     String[] columnasEmpleados = { "DNI", "Nombre", "Teléfono", "Puesto", "Sala", "Turno" };
     Object[][] datosEmpleados = { { "12345678A", "Juan Pérez", "600111222", "Médico", "", "" },
         { "87654321B", "María López", "600333444", "Enfermera", "", "" },
@@ -172,9 +179,37 @@ public class PanelGestionEmpleados extends JPanel {
     txtPuestoEmpleado.setFont(textFieldFont);
     panelFormularioEmpleadoLocal.add(txtPuestoEmpleado, gbc);
 
-    // Botones del formulario de empleado
+    // Sala (read-only for general modification)
     gbc.gridx = 0;
     gbc.gridy = 4;
+    JLabel lblSalaGeneral = new JLabel("Sala (solo lectura):");
+    lblSalaGeneral.setFont(labelFont);
+    lblSalaGeneral.setForeground(labelFgColor);
+    panelFormularioEmpleadoLocal.add(lblSalaGeneral, gbc);
+    gbc.gridx = 1;
+    gbc.gridy = 4;
+    txtSalaGeneral = new JTextField(20); // Make it read-only
+    txtSalaGeneral.setFont(textFieldFont);
+    txtSalaGeneral.setEditable(false);
+    panelFormularioEmpleadoLocal.add(txtSalaGeneral, gbc);
+
+    // NEW: Turno as JComboBox in general modification form
+    gbc.gridx = 0;
+    gbc.gridy = 5;
+    JLabel lblTurnoModificar = new JLabel("Turno:");
+    lblTurnoModificar.setFont(labelFont);
+    lblTurnoModificar.setForeground(labelFgColor);
+    panelFormularioEmpleadoLocal.add(lblTurnoModificar, gbc);
+    gbc.gridx = 1;
+    gbc.gridy = 5;
+    String[] turnosOptions = { "", "Mañana", "Tarde", "Noche" }; // Options for the JComboBox
+    cmbModificarTurno = new JComboBox<>(turnosOptions);
+    cmbModificarTurno.setFont(textFieldFont);
+    panelFormularioEmpleadoLocal.add(cmbModificarTurno, gbc);
+
+    // Botones del formulario de empleado
+    gbc.gridx = 0;
+    gbc.gridy = 6; // Adjusted gridy
     gbc.gridwidth = 2;
     gbc.anchor = GridBagConstraints.CENTER;
     JPanel panelBotonesFormulario = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
@@ -187,7 +222,7 @@ public class PanelGestionEmpleados extends JPanel {
     panelBotonesFormulario.add(btnCancelarEmpleado);
     panelFormularioEmpleadoLocal.add(panelBotonesFormulario, gbc);
 
-    // --- NEW: Vista de Formulario para Asignar Sala ---
+    // --- Vista de Formulario para Asignar Sala ---
     JPanel panelAsignarSala = new JPanel(new GridBagLayout());
     panelAsignarSala.setBackground(formPanelBgColor);
     panelAsignarSala.setBorder(new EmptyBorder(50, 50, 50, 50)); // Adjusted padding
@@ -251,7 +286,7 @@ public class PanelGestionEmpleados extends JPanel {
     panelBotonesAsignarSala.add(btnCancelarSala);
     panelAsignarSala.add(panelBotonesAsignarSala, gbcSala);
 
-    // --- NEW: Vista de Formulario para Asignar Turno ---
+    // --- Vista de Formulario para Asignar Turno ---
     JPanel panelAsignarTurno = new JPanel(new GridBagLayout());
     panelAsignarTurno.setBackground(formPanelBgColor);
     panelAsignarTurno.setBorder(new EmptyBorder(50, 50, 50, 50)); // Adjusted padding
@@ -287,7 +322,7 @@ public class PanelGestionEmpleados extends JPanel {
     txtNombreEmpleadoTurno.setEditable(false);
     panelAsignarTurno.add(txtNombreEmpleadoTurno, gbcTurno);
 
-    // Turno input
+    // MODIFIED: Turno JComboBox for assignment
     gbcTurno.gridx = 0;
     gbcTurno.gridy = 2;
     JLabel lblTurno = new JLabel("Asignar Turno:");
@@ -296,9 +331,10 @@ public class PanelGestionEmpleados extends JPanel {
     panelAsignarTurno.add(lblTurno, gbcTurno);
     gbcTurno.gridx = 1;
     gbcTurno.gridy = 2;
-    txtAsignarTurno = new JTextField(20);
-    txtAsignarTurno.setFont(textFieldFont);
-    panelAsignarTurno.add(txtAsignarTurno, gbcTurno);
+    String[] turnosAsignar = { "", "Mañana", "Tarde", "Noche" }; // Added an empty option
+    cmbAsignarTurno = new JComboBox<>(turnosAsignar);
+    cmbAsignarTurno.setFont(textFieldFont);
+    panelAsignarTurno.add(cmbAsignarTurno, gbcTurno);
 
     // Buttons for Asignar Turno
     gbcTurno.gridx = 0;
@@ -326,6 +362,7 @@ public class PanelGestionEmpleados extends JPanel {
     btnAgregar.addActionListener(e -> {
       ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Formulario");
       limpiarCamposEmpleado();
+      txtDNIEmpleado.setEditable(true); // DNI should be editable when adding a new employee
       filaSeleccionadaEmpleado = -1; // No hay fila seleccionada para agregar
     });
 
@@ -337,6 +374,11 @@ public class PanelGestionEmpleados extends JPanel {
         txtNombreEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
         txtTelefonoEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 2).toString());
         txtPuestoEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 3).toString());
+        // Populate Sala and Turno when modifying
+        txtSalaGeneral.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 4).toString());
+        // Set the current shift in the JComboBox for modification
+        cmbModificarTurno.setSelectedItem(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 5).toString());
+        txtDNIEmpleado.setEditable(false); // DNI should not be editable when modifying an existing employee
       } else {
         JOptionPane.showMessageDialog(this, "Seleccione un empleado para modificar.", "Error",
             JOptionPane.WARNING_MESSAGE);
@@ -357,7 +399,7 @@ public class PanelGestionEmpleados extends JPanel {
       }
     });
 
-    // MODIFIED: Action listener for "Asignar Turnos"
+    // Action listener for "Asignar Turnos"
     btnAsignarTurnos.addActionListener(e -> {
       filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
       if (filaSeleccionadaEmpleado != -1) {
@@ -365,15 +407,15 @@ public class PanelGestionEmpleados extends JPanel {
         // Pre-fill DNI and Nombre
         txtDniEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
         txtNombreEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
-        // Clear previous shift if any
-        txtAsignarTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 5).toString());
+        // Set the current shift in the JComboBox
+        cmbAsignarTurno.setSelectedItem(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 5).toString());
       } else {
         JOptionPane.showMessageDialog(this, "Seleccione un empleado para asignar un turno.", "Error",
             JOptionPane.WARNING_MESSAGE);
       }
     });
 
-    // MODIFIED: Action listener for "Asignar Salas"
+    // Action listener for "Asignar Salas"
     btnAsignarSalas.addActionListener(e -> {
       filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
       if (filaSeleccionadaEmpleado != -1) {
@@ -381,7 +423,7 @@ public class PanelGestionEmpleados extends JPanel {
         // Pre-fill DNI and Nombre
         txtDniEmpleadoSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
         txtNombreEmpleadoSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
-        // Clear previous room if any
+        // Set the current room
         txtAsignarSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 4).toString());
       } else {
         JOptionPane.showMessageDialog(this, "Seleccione un empleado para asignar una sala.", "Error",
@@ -394,22 +436,38 @@ public class PanelGestionEmpleados extends JPanel {
       String nombre = txtNombreEmpleado.getText().trim();
       String telefono = txtTelefonoEmpleado.getText().trim();
       String puesto = txtPuestoEmpleado.getText().trim();
+      String sala = txtSalaGeneral.getText().trim(); // Get sala from its JTextField
+      String turno = (String) cmbModificarTurno.getSelectedItem(); // Get turno from its JComboBox
 
       if (dni.isEmpty() || nombre.isEmpty() || telefono.isEmpty() || puesto.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error de Validación",
+        JOptionPane.showMessageDialog(this, "Los campos DNI, Nombre, Teléfono y Puesto son obligatorios.",
+            "Error de Validación",
+            JOptionPane.WARNING_MESSAGE);
+        return;
+      }
+
+      // Validate sala and turno if they are required for general modification
+      if (sala.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "El campo de Sala no puede estar vacío.", "Error de Validación",
+            JOptionPane.WARNING_MESSAGE);
+        return;
+      }
+      if (turno == null || turno.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Debe seleccionar un Turno.", "Error de Validación",
             JOptionPane.WARNING_MESSAGE);
         return;
       }
 
       if (filaSeleccionadaEmpleado == -1) { // Agregar nuevo empleado
-        // NEW: Add empty Sala and Turno when adding a new employee
-        modeloEmpleados.addRow(new Object[] { dni, nombre, telefono, puesto, "", "" });
+        // Add empty Sala and Turno when adding a new employee
+        modeloEmpleados.addRow(new Object[] { dni, nombre, telefono, puesto, sala, turno });
       } else { // Editar empleado existente
         modeloEmpleados.setValueAt(dni, filaSeleccionadaEmpleado, 0);
         modeloEmpleados.setValueAt(nombre, filaSeleccionadaEmpleado, 1);
         modeloEmpleados.setValueAt(telefono, filaSeleccionadaEmpleado, 2);
         modeloEmpleados.setValueAt(puesto, filaSeleccionadaEmpleado, 3);
-        // Sala and Turno columns remain unchanged during general edit
+        modeloEmpleados.setValueAt(sala, filaSeleccionadaEmpleado, 4); // Update Sala
+        modeloEmpleados.setValueAt(turno, filaSeleccionadaEmpleado, 5); // Update Turno
       }
       ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
       limpiarCamposEmpleado(); // Limpiar campos después de guardar
@@ -420,7 +478,7 @@ public class PanelGestionEmpleados extends JPanel {
       limpiarCamposEmpleado();
     });
 
-    // NEW: Action listener for saving Sala
+    // Action listener for saving Sala
     btnGuardarSala.addActionListener(e -> {
       String sala = txtAsignarSala.getText().trim();
       if (sala.isEmpty()) {
@@ -434,16 +492,16 @@ public class PanelGestionEmpleados extends JPanel {
       }
     });
 
-    // NEW: Action listener for canceling Sala assignment
+    // Action listener for canceling Sala assignment
     btnCancelarSala.addActionListener(e -> {
       ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
     });
 
-    // NEW: Action listener for saving Turno
+    // Action listener for saving Turno
     btnGuardarTurno.addActionListener(e -> {
-      String turno = txtAsignarTurno.getText().trim();
-      if (turno.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "El campo de Turno no puede estar vacío.", "Error de Validación",
+      String turno = (String) cmbAsignarTurno.getSelectedItem();
+      if (turno == null || turno.isEmpty()) { // Check for empty or null selection
+        JOptionPane.showMessageDialog(this, "Debe seleccionar un Turno.", "Error de Validación",
             JOptionPane.WARNING_MESSAGE);
         return;
       }
@@ -453,7 +511,7 @@ public class PanelGestionEmpleados extends JPanel {
       }
     });
 
-    // NEW: Action listener for canceling Turno assignment
+    // Action listener for canceling Turno assignment
     btnCancelarTurno.addActionListener(e -> {
       ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
     });
@@ -467,15 +525,10 @@ public class PanelGestionEmpleados extends JPanel {
     txtNombreEmpleado.setText("");
     txtTelefonoEmpleado.setText("");
     txtPuestoEmpleado.setText("");
-    // No need to clear Sala/Turno fields here as they have their own forms
+    txtSalaGeneral.setText(""); // Clear Sala field in general form
+    cmbModificarTurno.setSelectedItem(""); // Clear Turno JComboBox in general form
   }
 
-  /**
-   * Aplica un estilo consistente a los botones de gestión (Agregar, Editar,
-   * Eliminar, Guardar, Cancelar).
-   * 
-   * @param button El JButton al que se aplicará el estilo.
-   */
   private void styleGestionButton(JButton button) {
     button.setBackground(gestionButtonBgColor);
     button.setForeground(gestionButtonFgColor);
