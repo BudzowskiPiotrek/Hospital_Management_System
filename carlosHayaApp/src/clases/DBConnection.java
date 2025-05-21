@@ -9,8 +9,7 @@ import java.sql.Statement;
 
 public class DBConnection {
 
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/appcarloshaya"; // FALTA AÑADIR EL NOMBRE DE BASE
-																						// DE DATOS
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/appcarloshaya"; 																
 	private static final String DB_USUARIO = "root"; // CREO QUE ES ROOT POR DEFECTO PERO LO QUE PONDRA JAVI
 	private static final String DB_CONTRASENIA = ""; // CONTRASEÑA DE BASE DATOS
 
