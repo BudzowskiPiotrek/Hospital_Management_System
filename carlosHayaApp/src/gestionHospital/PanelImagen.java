@@ -7,7 +7,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-public class PanelImagen extends JPanel {
+public final class PanelImagen extends JPanel {
 	private Image img;
 	private final App app;
 

@@ -55,7 +55,7 @@ public class PanelRegistrar extends JPanel {
         rolComboBox.setPreferredSize(new Dimension(184, 25));
         rolComboBox.setFocusable(false);
 
-        JLabel usuarioLabel = new JLabel("Usuario:");
+        JLabel usuarioLabel = new JLabel("DNI/NIE:");
         usuarioLabel.setFont(labelFont);
         usuarioLabel.setForeground(labelColor);
         JTextField usuarioField = new JTextField(20);
@@ -64,11 +64,6 @@ public class PanelRegistrar extends JPanel {
         contrasenaLabel.setFont(labelFont);
         contrasenaLabel.setForeground(labelColor);
         JPasswordField contrasenaField = new JPasswordField(20);
-
-        JLabel contactoLabel = new JLabel("Contacto:");
-        contactoLabel.setFont(labelFont);
-        contactoLabel.setForeground(labelColor);
-        JTextField contactoField = new JTextField(20);
 
         // Añadir campos
         gbc.gridx = 0;
@@ -101,12 +96,6 @@ public class PanelRegistrar extends JPanel {
         gbc.gridx = 1;
         formPanel.add(contrasenaField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        formPanel.add(contactoLabel, gbc);
-        gbc.gridx = 1;
-        formPanel.add(contactoField, gbc);
-
         // === Botones ===
         JButton guardarBtn = new JButton("Guardar");
         JButton borrarBtn = new JButton("Borrar");
@@ -125,7 +114,7 @@ public class PanelRegistrar extends JPanel {
                 rolComboBox.setSelectedIndex(0);
                 usuarioField.setText("");
                 contrasenaField.setText("");
-                contactoField.setText("");
+
             }
         });
 
@@ -140,11 +129,10 @@ public class PanelRegistrar extends JPanel {
                 String rol = (String) rolComboBox.getSelectedItem();
                 String usuario = usuarioField.getText().trim();
                 String contrasena = new String(contrasenaField.getPassword());
-                String contacto = contactoField.getText().trim();
 
                 // 1. Comprobar campos vacíos
                 if (nombre.isEmpty() || apellido.isEmpty() || rol.equals("Seleccionar") || usuario.isEmpty()
-                        || contrasena.isEmpty() || contacto.isEmpty()) {
+                        || contrasena.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Campos obligatorios",
                             JOptionPane.WARNING_MESSAGE);
                     return;
@@ -161,13 +149,6 @@ public class PanelRegistrar extends JPanel {
                 if (!apellido.matches("^[A-Za-z\\s]+$")) {
                     JOptionPane.showMessageDialog(null, "El apellido no debe tener números.", "Apellido inválido",
                             JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // 4. Validar contacto (9 dígitos exactos, solo números)
-                if (!contacto.matches("^\\d{9}$")) {
-                    JOptionPane.showMessageDialog(null, "El contacto debe tener exactamente 9 números.",
-                            "Contacto inválido", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
