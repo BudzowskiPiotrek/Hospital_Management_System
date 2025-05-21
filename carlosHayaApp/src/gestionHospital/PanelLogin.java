@@ -5,6 +5,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import clases.DBConnection;
+
 public class PanelLogin extends JPanel {
 
 	private JTextField usuarioField;
@@ -105,8 +107,7 @@ public class PanelLogin extends JPanel {
 			String contrasena = new String(contrasenaField.getPassword());
 			switchParaCambiarPanel(usuario, contrasena);
 
-<<<<<<< Updated upstream
-=======
+
 			DBConnection db = new DBConnection();
 			String rol = db.iniciarSesion(usuario, contrasena);
 
@@ -136,7 +137,7 @@ public class PanelLogin extends JPanel {
 					break;
 				}
 			}
->>>>>>> Stashed changes
+
 		});
 
 
