@@ -116,12 +116,6 @@ class PanelDarCitas extends JPanel {
     timeField.setText("");
   }
 
-  /**
-   * Aplica un estilo consistente a los botones dentro de este panel.
-   *
-   * @param button  El JButton al que se aplicará el estilo.
-   * @param bgColor El color de fondo del botón.
-   */
   private void styleButton(JButton button, Color bgColor) {
     button.setBackground(bgColor);
     button.setForeground(Color.white);
