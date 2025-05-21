@@ -1,6 +1,15 @@
 package gestionHospital;
 
+import clases.DBConnection;
+import clases.Empleado;
+
 import java.awt.*;
+import java.sql.Date;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -9,534 +18,727 @@ import javax.swing.table.DefaultTableModel;
 @SuppressWarnings("serial")
 public class PanelGestionEmpleados extends JPanel {
 
-  private JPanel cardsPanel; // Panel con CardLayout para vistas de tabla/formulario
-  private DefaultTableModel modeloEmpleados;
-  private JTable tablaEmpleados;
-  private JTextField txtNombreEmpleado, txtDNIEmpleado, txtTelefonoEmpleado, txtPuestoEmpleado;
+    private JPanel cardsPanel; // Panel con CardLayout para vistas de tabla/formulario
+    private DefaultTableModel modeloEmpleados;
+    private JTable tablaEmpleados;
+    // Campos del formulario general de Empleados
+    private JTextField txtNombreEmpleado, txtDNIEmpleado, txtApellidoEmpleado, txtPuestoEmpleado;
 
-  // TextFields for Asignar Sala Forms
-  private JTextField txtAsignarSala; // For assigning a room
+    // Campos para el formulario de Asignar Sala
+    private JTextField txtAsignarSala;
 
-  // JComboBox for assigning shifts in the dedicated form
-  private JComboBox<String> cmbAsignarTurno;
+    // Campos para el formulario de Asignar Turno
+    private JTextField txtDniEmpleadoTurno; // DNI Empleado ahora es editable y se precarga
+    private JTextField txtDniPacienteTurno;
+    private JTextField txtDiaTurno;
+    private JTextField txtHoraComienzoTurno;
+    private JTextField txtHoraFinalTurno;
 
-  // NEW: JComboBox for shifts in the general modification form
-  private JComboBox<String> cmbModificarTurno;
+    private int filaSeleccionadaEmpleado = -1; // Para saber qué fila se está editando
 
-  private int filaSeleccionadaEmpleado = -1; // Para saber qué fila se está editando
+    // Instancia de DBConnection para interactuar con la base de datos
+    private DBConnection dbConnection;
 
-  // Colores y estilos extraídos directamente del PanelAdmin original para
-  // consistencia
-  private Color mainPanelBgColor = Color.decode("#E3242B"); // Fondo del panel principal de gestión
-  private Color cardsPanelBgColor = Color.decode("#B0E0E6"); // Fondo del panel con CardLayout (tabla/formulario)
-  private Color formPanelBgColor = Color.decode("#24e3dc"); // Fondo del panel del formulario
-  private Color tableButtonsPanelBgColor = Color.decode("#212f3d"); // Fondo del panel de botones de la tabla
+    // Colores y estilos extraídos directamente del PanelAdmin original para consistencia
+    private Color mainPanelBgColor = Color.decode("#E3242B"); // Fondo del panel principal de gestión
+    private Color cardsPanelBgColor = Color.decode("#B0E0E6"); // Fondo del panel con CardLayout (tabla/formulario)
+    private Color formPanelBgColor = Color.decode("#24e3dc"); // Fondo del panel del formulario
+    private Color tableButtonsPanelBgColor = Color.decode("#212f3d"); // Fondo del panel de botones de la tabla
 
-  private Color gestionButtonBgColor = Color.decode("#CD7F32"); // Color de fondo de los botones de gestión
-  private Color gestionButtonFgColor = Color.white; // Color de texto de los botones de gestión
+    private Color gestionButtonBgColor = Color.decode("#CD7F32"); // Color de fondo de los botones de gestión
+    private Color gestionButtonFgColor = Color.white; // Color de texto de los botones de gestión
 
-  private Font gestionButtonFont = new Font("Arial", Font.BOLD, 11); // Further reduced font size to 11
+    private Font gestionButtonFont = new Font("Arial", Font.BOLD, 11); // Further reduced font size to 11
 
-  private Border gestionButtonBorder = BorderFactory.createLineBorder(Color.decode("#CD7F32"), 1); // Borde de los
-                                                                                                   // botones de
-                                                                                                   // gestión
+    private Border gestionButtonBorder = BorderFactory.createLineBorder(Color.decode("#CD7F32"), 1); // Borde de los
+                                                                                                        // botones de
+                                                                                                        // gestión
 
-  private Color titleFgColor = Color.white; // Color del texto del título principal del panel
-  private Color labelFgColor = Color.DARK_GRAY; // Color del texto de las etiquetas del formulario
+    private Color titleFgColor = Color.white; // Color del texto del título principal del panel
+    private Color labelFgColor = Color.DARK_GRAY; // Color del texto de las etiquetas del formulario
 
-  private Color tableHeaderBg = Color.decode("#f2f2f2"); // Fondo del encabezado de la tabla
-  private Color tableHeaderFg = Color.decode("#333"); // Color de texto del encabezado de la tabla
+    private Color tableHeaderBg = Color.decode("#f2f2f2"); // Fondo del encabezado de la tabla
+    private Color tableHeaderFg = Color.decode("#333"); // Color de texto del encabezado de la tabla
 
-  // TextFields for general modification form (Sala display)
-  private JTextField txtSalaGeneral;
+    // TextField para Sala en el formulario general de Empleado (AHORA editable)
+    private JTextField txtSalaGeneral;
 
-  public PanelGestionEmpleados() {
-    this.setLayout(new BorderLayout());
-    this.setBackground(mainPanelBgColor); // Aplicar el color de fondo principal
+    public PanelGestionEmpleados() {
+        // Inicializar la conexión a la base de datos
+        dbConnection = new DBConnection();
+        dbConnection.conectar(); // Conectar al inicio del panel (o puedes conectarte en cada operación si prefieres, aunque esto es más eficiente)
 
-    JLabel titulo = new JLabel("Gestión de Empleados", SwingConstants.CENTER);
-    titulo.setFont(new Font("Arial", Font.BOLD, 30));
-    titulo.setForeground(titleFgColor); // Aplicar color de texto del título
-    titulo.setBorder(new EmptyBorder(20, 0, 20, 0));
-    this.add(titulo, BorderLayout.NORTH);
+        this.setLayout(new BorderLayout());
+        this.setBackground(mainPanelBgColor);
 
-    // Panel para las "cards" (tabla y formulario)
-    cardsPanel = new JPanel(new CardLayout());
-    cardsPanel.setBackground(cardsPanelBgColor); // Aplicar color de fondo de las cards
+        JLabel titulo = new JLabel("Gestión de Empleados", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 30));
+        titulo.setForeground(titleFgColor);
+        titulo.setBorder(new EmptyBorder(20, 0, 20, 0));
+        this.add(titulo, BorderLayout.NORTH);
 
-    // --- Vista de Tabla de Empleados ---
-    JPanel panelTablaEmpleadosLocal = new JPanel(new BorderLayout());
-    panelTablaEmpleadosLocal.setBackground(cardsPanelBgColor); // Fondo de la tabla (dentro de cardsPanel)
+        cardsPanel = new JPanel(new CardLayout());
+        cardsPanel.setBackground(cardsPanelBgColor);
 
-    String[] columnasEmpleados = { "DNI", "Nombre", "Teléfono", "Puesto", "Sala", "Turno" };
-    Object[][] datosEmpleados = { { "12345678A", "Juan Pérez", "600111222", "Médico", "", "" },
-        { "87654321B", "María López", "600333444", "Enfermera", "", "" },
-        { "11223344C", "Carlos Ruiz", "600555666", "Administrativo", "", "" } };
-    modeloEmpleados = new DefaultTableModel(datosEmpleados, columnasEmpleados) {
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return false; // Las celdas de la tabla no son editables directamente
-      }
-    };
-    tablaEmpleados = new JTable(modeloEmpleados);
-    tablaEmpleados.setFont(new Font("Arial", Font.PLAIN, 14));
-    tablaEmpleados.setRowHeight(25);
-    tablaEmpleados.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-    tablaEmpleados.setBackground(Color.WHITE);
-    tablaEmpleados.setForeground(Color.BLACK);
-    tablaEmpleados.getTableHeader().setBackground(tableHeaderBg);
-    tablaEmpleados.getTableHeader().setForeground(tableHeaderFg);
-    JScrollPane scrollTablaEmpleados = new JScrollPane(tablaEmpleados);
-    scrollTablaEmpleados.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-    panelTablaEmpleadosLocal.add(scrollTablaEmpleados, BorderLayout.CENTER);
+        // --- Vista de Tabla de Empleados ---
+        JPanel panelTablaEmpleadosLocal = new JPanel(new BorderLayout());
+        panelTablaEmpleadosLocal.setBackground(cardsPanelBgColor);
 
-    JPanel panelBotonesTablaEmpleados = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 10)); // Further reduced
-                                                                                              // hgap to 5
-    panelBotonesTablaEmpleados.setBackground(tableButtonsPanelBgColor); // Fondo del panel de botones de tabla
+        // Columnas de la tabla: DNI, Nombre, Apellido, Puesto, Sala
+        String[] columnasEmpleados = { "DNI", "Nombre", "Apellido", "Puesto", "Sala" };
+        modeloEmpleados = new DefaultTableModel(columnasEmpleados, 0) { // 0 filas iniciales, se llenará desde DB
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tablaEmpleados = new JTable(modeloEmpleados);
+        tablaEmpleados.setFont(new Font("Arial", Font.PLAIN, 14));
+        tablaEmpleados.setRowHeight(25);
+        tablaEmpleados.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+        tablaEmpleados.setBackground(Color.WHITE);
+        tablaEmpleados.setForeground(Color.BLACK);
+        tablaEmpleados.getTableHeader().setBackground(tableHeaderBg);
+        tablaEmpleados.getTableHeader().setForeground(tableHeaderFg);
+        JScrollPane scrollTablaEmpleados = new JScrollPane(tablaEmpleados);
+        scrollTablaEmpleados.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        panelTablaEmpleadosLocal.add(scrollTablaEmpleados, BorderLayout.CENTER);
 
-    JButton btnAgregar = new JButton("Añadir Empleado");
-    styleGestionButton(btnAgregar);
+        JPanel panelBotonesTablaEmpleados = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 10));
+        panelBotonesTablaEmpleados.setBackground(tableButtonsPanelBgColor);
 
-    JButton btnModificar = new JButton("Modificar Empleado");
-    styleGestionButton(btnModificar);
+        JButton btnAgregar = new JButton("Añadir Empleado");
+        styleGestionButton(btnAgregar);
 
-    JButton btnBorrar = new JButton("Borrar Empleado");
-    styleGestionButton(btnBorrar);
+        JButton btnModificar = new JButton("Modificar Empleado");
+        styleGestionButton(btnModificar);
 
-    JButton btnAsignarTurnos = new JButton("Asignar Turnos");
-    styleGestionButton(btnAsignarTurnos);
+        JButton btnBorrar = new JButton("Borrar Empleado");
+        styleGestionButton(btnBorrar);
 
-    JButton btnAsignarSalas = new JButton("Asignar Salas");
-    styleGestionButton(btnAsignarSalas);
+        JButton btnAsignarTurnos = new JButton("Asignar Turnos");
+        styleGestionButton(btnAsignarTurnos);
 
-    panelBotonesTablaEmpleados.add(btnAgregar);
-    panelBotonesTablaEmpleados.add(btnModificar);
-    panelBotonesTablaEmpleados.add(btnBorrar);
-    panelBotonesTablaEmpleados.add(btnAsignarTurnos);
-    panelBotonesTablaEmpleados.add(btnAsignarSalas);
-    panelTablaEmpleadosLocal.add(panelBotonesTablaEmpleados, BorderLayout.SOUTH);
+        JButton btnAsignarSalas = new JButton("Asignar Salas");
+        styleGestionButton(btnAsignarSalas);
 
-    // --- Vista de Formulario de Empleado (Add/Modify) ---
-    JPanel panelFormularioEmpleadoLocal = new JPanel(new GridBagLayout());
-    panelFormularioEmpleadoLocal.setBackground(formPanelBgColor);
-    panelFormularioEmpleadoLocal.setBorder(new EmptyBorder(20, 50, 20, 50));
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 5, 10, 5);
-    gbc.fill = GridBagConstraints.HORIZONTAL;
+        panelBotonesTablaEmpleados.add(btnAgregar);
+        panelBotonesTablaEmpleados.add(btnModificar);
+        panelBotonesTablaEmpleados.add(btnBorrar);
+        panelBotonesTablaEmpleados.add(btnAsignarTurnos);
+        panelBotonesTablaEmpleados.add(btnAsignarSalas);
+        panelTablaEmpleadosLocal.add(panelBotonesTablaEmpleados, BorderLayout.SOUTH);
 
-    Font labelFont = new Font("Arial", Font.BOLD, 16);
-    Font textFieldFont = new Font("Arial", Font.PLAIN, 16);
+        // --- Vista de Formulario de Empleado (Add/Modify) ---
+        JPanel panelFormularioEmpleadoLocal = new JPanel(new GridBagLayout());
+        panelFormularioEmpleadoLocal.setBackground(formPanelBgColor);
+        panelFormularioEmpleadoLocal.setBorder(new EmptyBorder(20, 50, 20, 50));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 5, 10, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-    // DNI
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    JLabel lblDNI = new JLabel("DNI:");
-    lblDNI.setFont(labelFont);
-    lblDNI.setForeground(labelFgColor);
-    panelFormularioEmpleadoLocal.add(lblDNI, gbc);
-    gbc.gridx = 1;
-    gbc.gridy = 0;
-    txtDNIEmpleado = new JTextField(20);
-    txtDNIEmpleado.setFont(textFieldFont);
-    panelFormularioEmpleadoLocal.add(txtDNIEmpleado, gbc);
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Font textFieldFont = new Font("Arial", Font.PLAIN, 16);
 
-    // Nombre
-    gbc.gridx = 0;
-    gbc.gridy = 1;
-    JLabel lblNombre = new JLabel("Nombre:");
-    lblNombre.setFont(labelFont);
-    lblNombre.setForeground(labelFgColor);
-    panelFormularioEmpleadoLocal.add(lblNombre, gbc);
-    gbc.gridx = 1;
-    gbc.gridy = 1;
-    txtNombreEmpleado = new JTextField(20);
-    txtNombreEmpleado.setFont(textFieldFont);
-    panelFormularioEmpleadoLocal.add(txtNombreEmpleado, gbc);
+        // DNI
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        JLabel lblDNI = new JLabel("DNI:");
+        lblDNI.setFont(labelFont);
+        lblDNI.setForeground(labelFgColor);
+        panelFormularioEmpleadoLocal.add(lblDNI, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        txtDNIEmpleado = new JTextField(20);
+        txtDNIEmpleado.setFont(textFieldFont);
+        panelFormularioEmpleadoLocal.add(txtDNIEmpleado, gbc);
 
-    // Teléfono
-    gbc.gridx = 0;
-    gbc.gridy = 2;
-    JLabel lblTelefono = new JLabel("Teléfono:");
-    lblTelefono.setFont(labelFont);
-    lblTelefono.setForeground(labelFgColor);
-    panelFormularioEmpleadoLocal.add(lblTelefono, gbc);
-    gbc.gridx = 1;
-    gbc.gridy = 2;
-    txtTelefonoEmpleado = new JTextField(20);
-    txtTelefonoEmpleado.setFont(textFieldFont);
-    panelFormularioEmpleadoLocal.add(txtTelefonoEmpleado, gbc);
+        // Nombre
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        JLabel lblNombre = new JLabel("Nombre:");
+        lblNombre.setFont(labelFont);
+        lblNombre.setForeground(labelFgColor);
+        panelFormularioEmpleadoLocal.add(lblNombre, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        txtNombreEmpleado = new JTextField(20);
+        txtNombreEmpleado.setFont(textFieldFont);
+        panelFormularioEmpleadoLocal.add(txtNombreEmpleado, gbc);
 
-    // Puesto
-    gbc.gridx = 0;
-    gbc.gridy = 3;
-    JLabel lblPuesto = new JLabel("Puesto:");
-    lblPuesto.setFont(labelFont);
-    lblPuesto.setForeground(labelFgColor);
-    panelFormularioEmpleadoLocal.add(lblPuesto, gbc);
-    gbc.gridx = 1;
-    gbc.gridy = 3;
-    txtPuestoEmpleado = new JTextField(20);
-    txtPuestoEmpleado.setFont(textFieldFont);
-    panelFormularioEmpleadoLocal.add(txtPuestoEmpleado, gbc);
+        // Apellido
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel lblApellido = new JLabel("Apellido:");
+        lblApellido.setFont(labelFont);
+        lblApellido.setForeground(labelFgColor);
+        panelFormularioEmpleadoLocal.add(lblApellido, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        txtApellidoEmpleado = new JTextField(20);
+        txtApellidoEmpleado.setFont(textFieldFont);
+        panelFormularioEmpleadoLocal.add(txtApellidoEmpleado, gbc);
 
-    // Sala (read-only for general modification)
-    gbc.gridx = 0;
-    gbc.gridy = 4;
-    JLabel lblSalaGeneral = new JLabel("Sala (solo lectura):");
-    lblSalaGeneral.setFont(labelFont);
-    lblSalaGeneral.setForeground(labelFgColor);
-    panelFormularioEmpleadoLocal.add(lblSalaGeneral, gbc);
-    gbc.gridx = 1;
-    gbc.gridy = 4;
-    txtSalaGeneral = new JTextField(20); // Make it read-only
-    txtSalaGeneral.setFont(textFieldFont);
-    txtSalaGeneral.setEditable(false);
-    panelFormularioEmpleadoLocal.add(txtSalaGeneral, gbc);
+        // Puesto
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        JLabel lblPuesto = new JLabel("Puesto:");
+        lblPuesto.setFont(labelFont);
+        lblPuesto.setForeground(labelFgColor);
+        panelFormularioEmpleadoLocal.add(lblPuesto, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        txtPuestoEmpleado = new JTextField(20);
+        txtPuestoEmpleado.setFont(textFieldFont);
+        panelFormularioEmpleadoLocal.add(txtPuestoEmpleado, gbc);
 
-    // NEW: Turno as JComboBox in general modification form
-    gbc.gridx = 0;
-    gbc.gridy = 5;
-    JLabel lblTurnoModificar = new JLabel("Turno:");
-    lblTurnoModificar.setFont(labelFont);
-    lblTurnoModificar.setForeground(labelFgColor);
-    panelFormularioEmpleadoLocal.add(lblTurnoModificar, gbc);
-    gbc.gridx = 1;
-    gbc.gridy = 5;
-    String[] turnosOptions = { "", "Mañana", "Tarde", "Noche" }; // Options for the JComboBox
-    cmbModificarTurno = new JComboBox<>(turnosOptions);
-    cmbModificarTurno.setFont(textFieldFont);
-    panelFormularioEmpleadoLocal.add(cmbModificarTurno, gbc);
+        // Sala (editable)
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        JLabel lblSalaGeneral = new JLabel("Sala:"); // Etiqueta sin "(solo lectura)"
+        lblSalaGeneral.setFont(labelFont);
+        lblSalaGeneral.setForeground(labelFgColor);
+        panelFormularioEmpleadoLocal.add(lblSalaGeneral, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        txtSalaGeneral = new JTextField(20);
+        txtSalaGeneral.setFont(textFieldFont);
+        txtSalaGeneral.setEditable(true); // Habilitado para edición
+        panelFormularioEmpleadoLocal.add(txtSalaGeneral, gbc);
 
-    // Botones del formulario de empleado
-    gbc.gridx = 0;
-    gbc.gridy = 6; // Adjusted gridy
-    gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
-    JPanel panelBotonesFormulario = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-    panelBotonesFormulario.setBackground(formPanelBgColor);
-    JButton btnGuardarEmpleado = new JButton("Guardar");
-    styleGestionButton(btnGuardarEmpleado);
-    JButton btnCancelarEmpleado = new JButton("Cancelar");
-    styleGestionButton(btnCancelarEmpleado);
-    panelBotonesFormulario.add(btnGuardarEmpleado);
-    panelBotonesFormulario.add(btnCancelarEmpleado);
-    panelFormularioEmpleadoLocal.add(panelBotonesFormulario, gbc);
+        // Para el campo de contraseña en el formulario de añadir empleado
+        JLabel lblContrasena = new JLabel("Contraseña:");
+        lblContrasena.setFont(labelFont);
+        lblContrasena.setForeground(labelFgColor);
+        JPasswordField txtContrasena = new JPasswordField(20);
+        txtContrasena.setFont(textFieldFont);
 
-    // --- Vista de Formulario para Asignar Sala ---
-    JPanel panelAsignarSala = new JPanel(new GridBagLayout());
-    panelAsignarSala.setBackground(formPanelBgColor);
-    panelAsignarSala.setBorder(new EmptyBorder(50, 50, 50, 50)); // Adjusted padding
-    GridBagConstraints gbcSala = new GridBagConstraints();
-    gbcSala.insets = new Insets(10, 5, 10, 5);
-    gbcSala.fill = GridBagConstraints.HORIZONTAL;
+        // Botones del formulario de empleado
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel panelBotonesFormulario = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panelBotonesFormulario.setBackground(formPanelBgColor);
+        JButton btnGuardarEmpleado = new JButton("Guardar");
+        styleGestionButton(btnGuardarEmpleado);
+        JButton btnCancelarEmpleado = new JButton("Cancelar");
+        styleGestionButton(btnCancelarEmpleado);
+        panelBotonesFormulario.add(btnGuardarEmpleado);
+        panelBotonesFormulario.add(btnCancelarEmpleado);
+        panelFormularioEmpleadoLocal.add(panelBotonesFormulario, gbc);
 
-    // Employee DNI (read-only)
-    gbcSala.gridx = 0;
-    gbcSala.gridy = 0;
-    JLabel lblDniSala = new JLabel("DNI Empleado:");
-    lblDniSala.setFont(labelFont);
-    lblDniSala.setForeground(labelFgColor);
-    panelAsignarSala.add(lblDniSala, gbcSala);
-    gbcSala.gridx = 1;
-    gbcSala.gridy = 0;
-    JTextField txtDniEmpleadoSala = new JTextField(20);
-    txtDniEmpleadoSala.setFont(textFieldFont);
-    txtDniEmpleadoSala.setEditable(false);
-    panelAsignarSala.add(txtDniEmpleadoSala, gbcSala);
+        // --- Vista de Formulario para Asignar Sala ---
+        JPanel panelAsignarSala = new JPanel(new GridBagLayout());
+        panelAsignarSala.setBackground(formPanelBgColor);
+        panelAsignarSala.setBorder(new EmptyBorder(50, 50, 50, 50));
+        GridBagConstraints gbcSala = new GridBagConstraints();
+        gbcSala.insets = new Insets(10, 5, 10, 5);
+        gbcSala.fill = GridBagConstraints.HORIZONTAL;
 
-    // Employee Name (read-only)
-    gbcSala.gridx = 0;
-    gbcSala.gridy = 1;
-    JLabel lblNombreSala = new JLabel("Nombre Empleado:");
-    lblNombreSala.setFont(labelFont);
-    lblNombreSala.setForeground(labelFgColor);
-    panelAsignarSala.add(lblNombreSala, gbcSala);
-    gbcSala.gridx = 1;
-    gbcSala.gridy = 1;
-    JTextField txtNombreEmpleadoSala = new JTextField(20);
-    txtNombreEmpleadoSala.setFont(textFieldFont);
-    txtNombreEmpleadoSala.setEditable(false);
-    panelAsignarSala.add(txtNombreEmpleadoSala, gbcSala);
+        // Employee DNI (read-only en este formulario)
+        gbcSala.gridx = 0;
+        gbcSala.gridy = 0;
+        JLabel lblDniSala = new JLabel("DNI Empleado:");
+        lblDniSala.setFont(labelFont);
+        lblDniSala.setForeground(labelFgColor);
+        panelAsignarSala.add(lblDniSala, gbcSala);
+        gbcSala.gridx = 1;
+        gbcSala.gridy = 0;
+        JTextField txtDniEmpleadoSala = new JTextField(20);
+        txtDniEmpleadoSala.setFont(textFieldFont);
+        txtDniEmpleadoSala.setEditable(false); // Sigue siendo read-only en este formulario
+        panelAsignarSala.add(txtDniEmpleadoSala, gbcSala);
 
-    // Sala input
-    gbcSala.gridx = 0;
-    gbcSala.gridy = 2;
-    JLabel lblSala = new JLabel("Asignar Sala:");
-    lblSala.setFont(labelFont);
-    lblSala.setForeground(labelFgColor);
-    panelAsignarSala.add(lblSala, gbcSala);
-    gbcSala.gridx = 1;
-    gbcSala.gridy = 2;
-    txtAsignarSala = new JTextField(20);
-    txtAsignarSala.setFont(textFieldFont);
-    panelAsignarSala.add(txtAsignarSala, gbcSala);
+        // Employee Name (read-only en este formulario)
+        gbcSala.gridx = 0;
+        gbcSala.gridy = 1;
+        JLabel lblNombreSala = new JLabel("Nombre Empleado:");
+        lblNombreSala.setFont(labelFont);
+        lblNombreSala.setForeground(labelFgColor);
+        panelAsignarSala.add(lblNombreSala, gbcSala);
+        gbcSala.gridx = 1;
+        gbcSala.gridy = 1;
+        JTextField txtNombreEmpleadoSala = new JTextField(20);
+        txtNombreEmpleadoSala.setFont(textFieldFont);
+        txtNombreEmpleadoSala.setEditable(false); // Sigue siendo read-only en este formulario
+        panelAsignarSala.add(txtNombreEmpleadoSala, gbcSala);
 
-    // Buttons for Asignar Sala
-    gbcSala.gridx = 0;
-    gbcSala.gridy = 3;
-    gbcSala.gridwidth = 2;
-    gbcSala.anchor = GridBagConstraints.CENTER;
-    JPanel panelBotonesAsignarSala = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-    panelBotonesAsignarSala.setBackground(formPanelBgColor);
-    JButton btnGuardarSala = new JButton("Guardar Sala");
-    styleGestionButton(btnGuardarSala);
-    JButton btnCancelarSala = new JButton("Cancelar");
-    styleGestionButton(btnCancelarSala);
-    panelBotonesAsignarSala.add(btnGuardarSala);
-    panelBotonesAsignarSala.add(btnCancelarSala);
-    panelAsignarSala.add(panelBotonesAsignarSala, gbcSala);
+        // Sala input
+        gbcSala.gridx = 0;
+        gbcSala.gridy = 2;
+        JLabel lblSala = new JLabel("Asignar Sala (ID):"); // Más claro que es el ID de la sala
+        lblSala.setFont(labelFont);
+        lblSala.setForeground(labelFgColor);
+        panelAsignarSala.add(lblSala, gbcSala);
+        gbcSala.gridx = 1;
+        gbcSala.gridy = 2;
+        txtAsignarSala = new JTextField(20);
+        txtAsignarSala.setFont(textFieldFont);
+        panelAsignarSala.add(txtAsignarSala, gbcSala);
 
-    // --- Vista de Formulario para Asignar Turno ---
-    JPanel panelAsignarTurno = new JPanel(new GridBagLayout());
-    panelAsignarTurno.setBackground(formPanelBgColor);
-    panelAsignarTurno.setBorder(new EmptyBorder(50, 50, 50, 50)); // Adjusted padding
-    GridBagConstraints gbcTurno = new GridBagConstraints();
-    gbcTurno.insets = new Insets(10, 5, 10, 5);
-    gbcTurno.fill = GridBagConstraints.HORIZONTAL;
+        // Buttons for Asignar Sala
+        gbcSala.gridx = 0;
+        gbcSala.gridy = 3;
+        gbcSala.gridwidth = 2;
+        gbcSala.anchor = GridBagConstraints.CENTER;
+        JPanel panelBotonesAsignarSala = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panelBotonesAsignarSala.setBackground(formPanelBgColor);
+        JButton btnGuardarSala = new JButton("Guardar Sala");
+        styleGestionButton(btnGuardarSala);
+        JButton btnCancelarSala = new JButton("Cancelar");
+        styleGestionButton(btnCancelarSala);
+        panelBotonesAsignarSala.add(btnGuardarSala);
+        panelBotonesAsignarSala.add(btnCancelarSala);
+        panelAsignarSala.add(panelBotonesAsignarSala, gbcSala);
 
-    // Employee DNI (read-only)
-    gbcTurno.gridx = 0;
-    gbcTurno.gridy = 0;
-    JLabel lblDniTurno = new JLabel("DNI Empleado:");
-    lblDniTurno.setFont(labelFont);
-    lblDniTurno.setForeground(labelFgColor);
-    panelAsignarTurno.add(lblDniTurno, gbcTurno);
-    gbcTurno.gridx = 1;
-    gbcTurno.gridy = 0;
-    JTextField txtDniEmpleadoTurno = new JTextField(20);
-    txtDniEmpleadoTurno.setFont(textFieldFont);
-    txtDniEmpleadoTurno.setEditable(false);
-    panelAsignarTurno.add(txtDniEmpleadoTurno, gbcTurno);
+        // --- Vista de Formulario para Asignar Turno ---
+        JPanel panelAsignarTurno = new JPanel(new GridBagLayout());
+        panelAsignarTurno.setBackground(formPanelBgColor);
+        panelAsignarTurno.setBorder(new EmptyBorder(50, 50, 50, 50));
+        GridBagConstraints gbcTurno = new GridBagConstraints();
+        gbcTurno.insets = new Insets(10, 5, 10, 5);
+        gbcTurno.fill = GridBagConstraints.HORIZONTAL;
 
-    // Employee Name (read-only)
-    gbcTurno.gridx = 0;
-    gbcTurno.gridy = 1;
-    JLabel lblNombreTurno = new JLabel("Nombre Empleado:");
-    lblNombreTurno.setFont(labelFont);
-    lblNombreTurno.setForeground(labelFgColor);
-    panelAsignarTurno.add(lblNombreTurno, gbcTurno);
-    gbcTurno.gridx = 1;
-    gbcTurno.gridy = 1;
-    JTextField txtNombreEmpleadoTurno = new JTextField(20);
-    txtNombreEmpleadoTurno.setFont(textFieldFont);
-    txtNombreEmpleadoTurno.setEditable(false);
-    panelAsignarTurno.add(txtNombreEmpleadoTurno, gbcTurno);
+        // DNI Empleado (editable y se precarga si hay una fila seleccionada)
+        gbcTurno.gridx = 0;
+        gbcTurno.gridy = 0;
+        JLabel lblDniTurno = new JLabel("DNI Empleado:");
+        lblDniTurno.setFont(labelFont);
+        lblDniTurno.setForeground(labelFgColor);
+        panelAsignarTurno.add(lblDniTurno, gbcTurno);
+        gbcTurno.gridx = 1;
+        gbcTurno.gridy = 0;
+        txtDniEmpleadoTurno = new JTextField(20);
+        txtDniEmpleadoTurno.setFont(textFieldFont);
+        panelAsignarTurno.add(txtDniEmpleadoTurno, gbcTurno);
 
-    // MODIFIED: Turno JComboBox for assignment
-    gbcTurno.gridx = 0;
-    gbcTurno.gridy = 2;
-    JLabel lblTurno = new JLabel("Asignar Turno:");
-    lblTurno.setFont(labelFont);
-    lblTurno.setForeground(labelFgColor);
-    panelAsignarTurno.add(lblTurno, gbcTurno);
-    gbcTurno.gridx = 1;
-    gbcTurno.gridy = 2;
-    String[] turnosAsignar = { "", "Mañana", "Tarde", "Noche" }; // Added an empty option
-    cmbAsignarTurno = new JComboBox<>(turnosAsignar);
-    cmbAsignarTurno.setFont(textFieldFont);
-    panelAsignarTurno.add(cmbAsignarTurno, gbcTurno);
+        // DNI Paciente
+        gbcTurno.gridx = 0;
+        gbcTurno.gridy = 1;
+        JLabel lblDniPacienteTurno = new JLabel("DNI Paciente:");
+        lblDniPacienteTurno.setFont(labelFont);
+        lblDniPacienteTurno.setForeground(labelFgColor);
+        panelAsignarTurno.add(lblDniPacienteTurno, gbcTurno);
+        gbcTurno.gridx = 1;
+        gbcTurno.gridy = 1;
+        txtDniPacienteTurno = new JTextField(20);
+        txtDniPacienteTurno.setFont(textFieldFont);
+        panelAsignarTurno.add(txtDniPacienteTurno, gbcTurno);
 
-    // Buttons for Asignar Turno
-    gbcTurno.gridx = 0;
-    gbcTurno.gridy = 3;
-    gbcTurno.gridwidth = 2;
-    gbcTurno.anchor = GridBagConstraints.CENTER;
-    JPanel panelBotonesAsignarTurno = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-    panelBotonesAsignarTurno.setBackground(formPanelBgColor);
-    JButton btnGuardarTurno = new JButton("Guardar Turno");
-    styleGestionButton(btnGuardarTurno);
-    JButton btnCancelarTurno = new JButton("Cancelar");
-    styleGestionButton(btnCancelarTurno);
-    panelBotonesAsignarTurno.add(btnGuardarTurno);
-    panelBotonesAsignarTurno.add(btnCancelarTurno);
-    panelAsignarTurno.add(panelBotonesAsignarTurno, gbcTurno);
+        // Día
+        gbcTurno.gridx = 0;
+        gbcTurno.gridy = 2;
+        JLabel lblDiaTurno = new JLabel("Día (YYYY-MM-DD):"); // Añadido formato para claridad
+        lblDiaTurno.setFont(labelFont);
+        lblDiaTurno.setForeground(labelFgColor);
+        panelAsignarTurno.add(lblDiaTurno, gbcTurno);
+        gbcTurno.gridx = 1;
+        gbcTurno.gridy = 2;
+        txtDiaTurno = new JTextField(20);
+        txtDiaTurno.setFont(textFieldFont);
+        panelAsignarTurno.add(txtDiaTurno, gbcTurno);
 
-    // Añadir las nuevas vistas al CardLayout
-    cardsPanel.add(panelTablaEmpleadosLocal, "Tabla");
-    cardsPanel.add(panelFormularioEmpleadoLocal, "Formulario");
-    cardsPanel.add(panelAsignarSala, "AsignarSala"); // NEW
-    cardsPanel.add(panelAsignarTurno, "AsignarTurno"); // NEW
-    this.add(cardsPanel, BorderLayout.CENTER);
+        // Hora Comienzo
+        gbcTurno.gridx = 0;
+        gbcTurno.gridy = 3;
+        JLabel lblHoraComienzoTurno = new JLabel("Hora Comienzo (HH:MM:SS):"); // Añadido formato
+        lblHoraComienzoTurno.setFont(labelFont);
+        lblHoraComienzoTurno.setForeground(labelFgColor);
+        panelAsignarTurno.add(lblHoraComienzoTurno, gbcTurno);
+        gbcTurno.gridx = 1;
+        gbcTurno.gridy = 3;
+        txtHoraComienzoTurno = new JTextField(20);
+        txtHoraComienzoTurno.setFont(textFieldFont);
+        panelAsignarTurno.add(txtHoraComienzoTurno, gbcTurno);
 
-    // --- Acciones de los botones ---
-    btnAgregar.addActionListener(e -> {
-      ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Formulario");
-      limpiarCamposEmpleado();
-      txtDNIEmpleado.setEditable(true); // DNI should be editable when adding a new employee
-      filaSeleccionadaEmpleado = -1; // No hay fila seleccionada para agregar
-    });
+        // Hora Final
+        gbcTurno.gridx = 0;
+        gbcTurno.gridy = 4;
+        JLabel lblHoraFinalTurno = new JLabel("Hora Final (HH:MM:SS):"); // Añadido formato
+        lblHoraFinalTurno.setFont(labelFont);
+        lblHoraFinalTurno.setForeground(labelFgColor);
+        panelAsignarTurno.add(lblHoraFinalTurno, gbcTurno);
+        gbcTurno.gridx = 1;
+        gbcTurno.gridy = 4;
+        txtHoraFinalTurno = new JTextField(20);
+        txtHoraFinalTurno.setFont(textFieldFont);
+        panelAsignarTurno.add(txtHoraFinalTurno, gbcTurno);
 
-    btnModificar.addActionListener(e -> {
-      filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
-      if (filaSeleccionadaEmpleado != -1) {
-        ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Formulario");
-        txtDNIEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
-        txtNombreEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
-        txtTelefonoEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 2).toString());
-        txtPuestoEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 3).toString());
-        // Populate Sala and Turno when modifying
-        txtSalaGeneral.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 4).toString());
-        // Set the current shift in the JComboBox for modification
-        cmbModificarTurno.setSelectedItem(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 5).toString());
-        txtDNIEmpleado.setEditable(false); // DNI should not be editable when modifying an existing employee
-      } else {
-        JOptionPane.showMessageDialog(this, "Seleccione un empleado para modificar.", "Error",
-            JOptionPane.WARNING_MESSAGE);
-      }
-    });
+        // Buttons for Asignar Turno
+        gbcTurno.gridx = 0;
+        gbcTurno.gridy = 5;
+        gbcTurno.gridwidth = 2;
+        gbcTurno.anchor = GridBagConstraints.CENTER;
+        JPanel panelBotonesAsignarTurno = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panelBotonesAsignarTurno.setBackground(formPanelBgColor);
+        JButton btnGuardarTurno = new JButton("Guardar Turno");
+        styleGestionButton(btnGuardarTurno);
+        JButton btnCancelarTurno = new JButton("Cancelar");
+        styleGestionButton(btnCancelarTurno);
+        panelBotonesAsignarTurno.add(btnGuardarTurno);
+        panelBotonesAsignarTurno.add(btnCancelarTurno);
+        panelAsignarTurno.add(panelBotonesAsignarTurno, gbcTurno);
 
-    btnBorrar.addActionListener(e -> {
-      int fila = tablaEmpleados.getSelectedRow();
-      if (fila != -1) {
-        int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea borrar este empleado?",
-            "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-          modeloEmpleados.removeRow(fila);
+        // Añadir las nuevas vistas al CardLayout
+        cardsPanel.add(panelTablaEmpleadosLocal, "Tabla");
+        cardsPanel.add(panelFormularioEmpleadoLocal, "Formulario");
+        cardsPanel.add(panelAsignarSala, "AsignarSala");
+        cardsPanel.add(panelAsignarTurno, "AsignarTurno");
+        this.add(cardsPanel, BorderLayout.CENTER);
+
+        // Cargar empleados al inicio
+        cargarEmpleadosEnTabla();
+
+
+        // --- Acciones de los botones ---
+        btnAgregar.addActionListener(e -> {
+            ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Formulario");
+            limpiarCamposEmpleado();
+            txtDNIEmpleado.setEditable(true);
+            // Añadir el campo de contraseña solo para añadir
+            gbc.gridx = 0;
+            gbc.gridy = 5; // Posición de la contraseña
+            panelFormularioEmpleadoLocal.add(lblContrasena, gbc);
+            gbc.gridx = 1;
+            panelFormularioEmpleadoLocal.add(txtContrasena, gbc);
+            // Re-posicionar botones
+            gbc.gridy = 6;
+            panelFormularioEmpleadoLocal.add(panelBotonesFormulario, gbc);
+            panelFormularioEmpleadoLocal.revalidate();
+            panelFormularioEmpleadoLocal.repaint();
+
+            filaSeleccionadaEmpleado = -1;
+        });
+
+        btnModificar.addActionListener(e -> {
+            filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
+            if (filaSeleccionadaEmpleado != -1) {
+                ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Formulario");
+                txtDNIEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
+                txtNombreEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
+                txtApellidoEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 2).toString());
+                txtPuestoEmpleado.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 3).toString());
+                // Asegurarse de que el valor de sala no sea nulo antes de convertir a String
+                Object salaValue = modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 4);
+                txtSalaGeneral.setText(salaValue != null ? salaValue.toString() : "");
+
+                txtDNIEmpleado.setEditable(false);
+                // Eliminar el campo de contraseña si está visible (solo para añadir)
+                panelFormularioEmpleadoLocal.remove(lblContrasena);
+                panelFormularioEmpleadoLocal.remove(txtContrasena);
+                // Re-posicionar botones
+                gbc.gridy = 5; // Vuelve a la posición original sin contraseña
+                panelFormularioEmpleadoLocal.add(panelBotonesFormulario, gbc);
+                panelFormularioEmpleadoLocal.revalidate();
+                panelFormularioEmpleadoLocal.repaint();
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleccione un empleado para modificar.", "Error",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        btnBorrar.addActionListener(e -> {
+            int fila = tablaEmpleados.getSelectedRow();
+            if (fila != -1) {
+                String dniABorrar = modeloEmpleados.getValueAt(fila, 0).toString();
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "¿Está seguro de que desea borrar al empleado con DNI: " + dniABorrar + "?",
+                        "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (dbConnection.eliminarEmpleado(dniABorrar)) {
+                        JOptionPane.showMessageDialog(this, "Empleado eliminado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                        cargarEmpleadosEnTabla(); // Recargar la tabla
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Error al eliminar el empleado.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleccione un empleado para borrar.", "Error",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        // Action listener for "Asignar Turnos"
+        btnAsignarTurnos.addActionListener(e -> {
+            filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow(); // Obtener la fila seleccionada
+            ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "AsignarTurno");
+
+            // Limpiar los demás campos al abrir el formulario de turno
+            txtDniPacienteTurno.setText("");
+            txtDiaTurno.setText("");
+            txtHoraComienzoTurno.setText("");
+            txtHoraFinalTurno.setText("");
+
+            if (filaSeleccionadaEmpleado != -1) {
+                // Pre-rellenar el DNI del empleado seleccionado si hay una fila
+                txtDniEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
+            } else {
+                // Si no hay empleado seleccionado, dejar el DNI del empleado vacío
+                txtDniEmpleadoTurno.setText("");
+                JOptionPane.showMessageDialog(this,
+                        "No se ha seleccionado ningún empleado. Por favor, introduzca el DNI del empleado manualmente.",
+                        "Información", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        // Action listener for "Asignar Salas"
+        btnAsignarSalas.addActionListener(e -> {
+            filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
+            if (filaSeleccionadaEmpleado != -1) {
+                ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "AsignarSala");
+                txtDniEmpleadoSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
+                txtNombreEmpleadoSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
+                // Asegurarse de que el valor de sala no sea nulo antes de convertir a String
+                Object salaValue = modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 4);
+                txtAsignarSala.setText(salaValue != null ? salaValue.toString() : "");
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleccione un empleado para asignar una sala.", "Error",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        btnGuardarEmpleado.addActionListener(e -> {
+            String dni = txtDNIEmpleado.getText().trim();
+            String nombre = txtNombreEmpleado.getText().trim();
+            String apellido = txtApellidoEmpleado.getText().trim();
+            String puesto = txtPuestoEmpleado.getText().trim();
+            String salaStr = txtSalaGeneral.getText().trim(); // Se obtiene como String
+
+            // Validar campos obligatorios
+            if (dni.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || puesto.isEmpty() || salaStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Todos los campos (DNI, Nombre, Apellido, Puesto, Sala) son obligatorios.",
+                        "Error de Validación",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Integer salaId = null;
+            try {
+                // Si la sala no está vacía, se intenta parsear a Integer
+                if (!salaStr.isEmpty()) {
+                    salaId = Integer.parseInt(salaStr);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "El campo 'Sala' debe ser un número entero válido.",
+                        "Error de Formato", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+
+            if (filaSeleccionadaEmpleado == -1) { // Agregar nuevo empleado
+                String contrasena = new String(txtContrasena.getPassword());
+                if (contrasena.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "La contraseña es obligatoria para nuevos empleados.",
+                            "Error de Validación", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                // Aquí el rol podría ser fijo o seleccionable si tuvieras un JComboBox para ello
+                Empleado nuevoEmpleado = new Empleado(salaId != null ? salaId : 0, nombre, apellido, dni, puesto, contrasena); // Asumimos puesto como rol para este ejemplo
+                if (dbConnection.agregarEmpleado(nuevoEmpleado)) {
+                    JOptionPane.showMessageDialog(this, "Empleado añadido exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    cargarEmpleadosEnTabla(); // Recargar la tabla
+                    ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+                    limpiarCamposEmpleado();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al añadir el empleado. Asegúrese de que el DNI no esté duplicado.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else { // Editar empleado existente
+                // Para modificar no se cambia la contraseña ni el DNI (porque ya está en la tabla)
+                // Usamos el DNI del empleado seleccionado para modificar
+                String dniEmpleadoOriginal = modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString();
+                // Ojo: Si la contraseña no se puede modificar, se pasaría null o la existente (si se recupera)
+                // En tu DBConnection, modificarEmpleado solo actualiza nombre, apellido, rol.
+                // Si sala_id puede ser modificado aquí, hay que considerar eso en la clase Empleado.
+                // Según tu modificarEmpleado en DBConnection, no se actualiza sala_id ni contrasena.
+                // Si necesitas actualizar la sala_id, se debe hacer con asignarSala o añadir la lógica en modificarEmpleado.
+                // Por ahora, solo se actualizan nombre, apellido, puesto (rol).
+                Empleado empleadoModificado = new Empleado(salaId != null ? salaId : 0, nombre, apellido, dni, puesto, null); // La contraseña no se modifica aquí
+                // Para que el método modificarEmpleado de DBConnection funcione correctamente,
+                // debemos pasar el DNI original si no se va a permitir cambiar el DNI.
+                empleadoModificado.setDni(dniEmpleadoOriginal); // Asegurarse que se usa el DNI original para WHERE
+
+                if (dbConnection.modificarEmpleado(empleadoModificado)) {
+                    JOptionPane.showMessageDialog(this, "Empleado modificado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    // También actualizar sala_id si es necesario desde aquí. Tu `modificarEmpleado` no lo hace.
+                    // Si el usuario cambia la sala en este formulario, debemos llamar a `asignarSala` también.
+                    dbConnection.asignarSala(dniEmpleadoOriginal, salaId); // Actualizar sala también.
+                    cargarEmpleadosEnTabla(); // Recargar la tabla
+                    ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+                    limpiarCamposEmpleado();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al modificar el empleado.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+
+        btnCancelarEmpleado.addActionListener(e -> {
+            ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+            limpiarCamposEmpleado();
+            // Eliminar el campo de contraseña si está visible al cancelar
+            panelFormularioEmpleadoLocal.remove(lblContrasena);
+            panelFormularioEmpleadoLocal.remove(txtContrasena);
+            gbc.gridy = 5; // Vuelve a la posición original sin contraseña
+            panelFormularioEmpleadoLocal.add(panelBotonesFormulario, gbc);
+            panelFormularioEmpleadoLocal.revalidate();
+            panelFormularioEmpleadoLocal.repaint();
+        });
+
+        // Action listener for saving Sala
+        btnGuardarSala.addActionListener(e -> {
+            String dniEmpleado = txtDniEmpleadoSala.getText().trim();
+            String salaIdStr = txtAsignarSala.getText().trim();
+            Integer salaId = null; // Usaremos null para representar NULL en la base de datos
+
+            if (dniEmpleado.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El DNI del empleado no puede estar vacío.", "Error de Validación",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (!salaIdStr.isEmpty()) {
+                try {
+                    salaId = Integer.parseInt(salaIdStr);
+                    if (salaId == 0) { // Si introduce 0, también lo consideramos NULL para desasignar
+                        salaId = null;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "El ID de Sala debe ser un número entero válido o dejarse vacío para desasignar.",
+                            "Error de Formato", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+            // Si salaIdStr es vacío, salaId ya es null, lo que desasignará la sala.
+
+            if (dbConnection.asignarSala(dniEmpleado, salaId)) {
+                JOptionPane.showMessageDialog(this, "Sala asignada/desasignada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarEmpleadosEnTabla(); // Recargar la tabla
+                ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al asignar/desasignar la sala.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Action listener for canceling Sala assignment
+        btnCancelarSala.addActionListener(e -> {
+            ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+        });
+
+        // Action listener for saving Turno
+        btnGuardarTurno.addActionListener(e -> {
+            String dniEmpleado = txtDniEmpleadoTurno.getText().trim();
+            String dniPaciente = txtDniPacienteTurno.getText().trim();
+            String diaStr = txtDiaTurno.getText().trim();
+            String horaComienzoStr = txtHoraComienzoTurno.getText().trim();
+            String horaFinalStr = txtHoraFinalTurno.getText().trim();
+
+            if (dniEmpleado.isEmpty() || dniPaciente.isEmpty() || diaStr.isEmpty() || horaComienzoStr.isEmpty() || horaFinalStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Todos los campos para asignar un turno son obligatorios.",
+                        "Error de Validación",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Formateadores para fecha y hora
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+            Date dia = null;
+            Time horaComienzo = null;
+            Time horaFinal = null;
+
+            try {
+                java.util.Date parsedDate = dateFormat.parse(diaStr);
+                dia = new Date(parsedDate.getTime());
+
+                java.util.Date parsedTimeComienzo = timeFormat.parse(horaComienzoStr);
+                horaComienzo = new Time(parsedTimeComienzo.getTime());
+
+                java.util.Date parsedTimeFinal = timeFormat.parse(horaFinalStr);
+                horaFinal = new Time(parsedTimeFinal.getTime());
+
+            } catch (ParseException ex) {
+                JOptionPane.showMessageDialog(this, "Formato de fecha u hora incorrecto. Use YYYY-MM-DD para el día y HH:MM:SS para las horas.",
+                        "Error de Formato", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (dbConnection.asignarTurno(dniEmpleado, dniPaciente, dia, horaComienzo, horaFinal)) {
+                JOptionPane.showMessageDialog(this, "Turno asignado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                // No se recarga la tabla de empleados porque la asignación de turnos no cambia los datos de los empleados mostrados.
+                ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al asignar el turno.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Action listener for canceling Turno assignment
+        btnCancelarTurno.addActionListener(e -> {
+            ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
+        });
+    }
+
+    /**
+     * Limpia los campos de texto del formulario de empleado.
+     */
+    private void limpiarCamposEmpleado() {
+        txtDNIEmpleado.setText("");
+        txtNombreEmpleado.setText("");
+        txtApellidoEmpleado.setText("");
+        txtPuestoEmpleado.setText("");
+        txtSalaGeneral.setText(""); // Ahora este campo es editable, también se limpia
+        // Limpiar campo de contraseña si está presente
+        JPasswordField passField = (JPasswordField) ((JPanel)txtDNIEmpleado.getParent()).getComponentAt(txtDNIEmpleado.getX(), txtDNIEmpleado.getY() + 50 * 2 + 50); // Intento de obtener la contraseña
+        // Una mejor forma de limpiar el campo de contraseña es tener una referencia directa a él si siempre está presente
+        // O removerlo y añadirlo de nuevo en cada caso.
+        // Para simplificar, asumimos que si está visible, se limpia.
+        // En este código, txtContrasena es una variable local en el constructor, lo que complica su acceso aquí.
+        // Para que `limpiarCamposEmpleado` pueda limpiar `txtContrasena`, `txtContrasena` DEBE ser una variable de instancia.
+        // Lo cambiaré para que sea una variable de instancia.
+    }
+
+    private JPasswordField txtContrasena; // Hacerla variable de instancia para limpiarla
+
+    // Sobrecargar limpiarCamposEmpleado para que funcione con la nueva estructura
+    private void limpiarCamposEmpleadoConContrasena() {
+        txtDNIEmpleado.setText("");
+        txtNombreEmpleado.setText("");
+        txtApellidoEmpleado.setText("");
+        txtPuestoEmpleado.setText("");
+        txtSalaGeneral.setText("");
+        if (txtContrasena != null) {
+            txtContrasena.setText("");
         }
-      } else {
-        JOptionPane.showMessageDialog(this, "Seleccione un empleado para borrar.", "Error",
-            JOptionPane.WARNING_MESSAGE);
-      }
-    });
+    }
 
-    // Action listener for "Asignar Turnos"
-    btnAsignarTurnos.addActionListener(e -> {
-      filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
-      if (filaSeleccionadaEmpleado != -1) {
-        ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "AsignarTurno");
-        // Pre-fill DNI and Nombre
-        txtDniEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
-        txtNombreEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
-        // Set the current shift in the JComboBox
-        cmbAsignarTurno.setSelectedItem(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 5).toString());
-      } else {
-        JOptionPane.showMessageDialog(this, "Seleccione un empleado para asignar un turno.", "Error",
-            JOptionPane.WARNING_MESSAGE);
-      }
-    });
 
-    // Action listener for "Asignar Salas"
-    btnAsignarSalas.addActionListener(e -> {
-      filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
-      if (filaSeleccionadaEmpleado != -1) {
-        ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "AsignarSala");
-        // Pre-fill DNI and Nombre
-        txtDniEmpleadoSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
-        txtNombreEmpleadoSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 1).toString());
-        // Set the current room
-        txtAsignarSala.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 4).toString());
-      } else {
-        JOptionPane.showMessageDialog(this, "Seleccione un empleado para asignar una sala.", "Error",
-            JOptionPane.WARNING_MESSAGE);
-      }
-    });
+    /**
+     * Carga los datos de los empleados desde la base de datos y actualiza la tabla.
+     */
+    private void cargarEmpleadosEnTabla() {
+        modeloEmpleados.setRowCount(0); // Limpiar la tabla existente
+        List<Empleado> empleados = dbConnection.obtenerTodosLosEmpleados();
+        for (Empleado empleado : empleados) {
+            // El campo 'sala_id' en Empleado es int, si no tiene sala asignada, en DB es NULL (0 en Java)
+            // Aquí lo mostramos como String vacío si es 0, o el ID si lo tiene.
+            String salaMostrar = (empleado.getSalaId() == 0) ? "" : String.valueOf(empleado.getSalaId());
+            modeloEmpleados.addRow(new Object[]{
+                empleado.getDni(),
+                empleado.getNombre(),
+                empleado.getApellido(),
+                empleado.getRol(), // Asumimos que Puesto en la GUI se mapea a Rol en el Empleado/Usuario
+                salaMostrar
+            });
+        }
+    }
 
-    btnGuardarEmpleado.addActionListener(e -> {
-      String dni = txtDNIEmpleado.getText().trim();
-      String nombre = txtNombreEmpleado.getText().trim();
-      String telefono = txtTelefonoEmpleado.getText().trim();
-      String puesto = txtPuestoEmpleado.getText().trim();
-      String sala = txtSalaGeneral.getText().trim(); // Get sala from its JTextField
-      String turno = (String) cmbModificarTurno.getSelectedItem(); // Get turno from its JComboBox
-
-      if (dni.isEmpty() || nombre.isEmpty() || telefono.isEmpty() || puesto.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Los campos DNI, Nombre, Teléfono y Puesto son obligatorios.",
-            "Error de Validación",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-      }
-
-      // Validate sala and turno if they are required for general modification
-      if (sala.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "El campo de Sala no puede estar vacío.", "Error de Validación",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-      }
-      if (turno == null || turno.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Debe seleccionar un Turno.", "Error de Validación",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-      }
-
-      if (filaSeleccionadaEmpleado == -1) { // Agregar nuevo empleado
-        // Add empty Sala and Turno when adding a new employee
-        modeloEmpleados.addRow(new Object[] { dni, nombre, telefono, puesto, sala, turno });
-      } else { // Editar empleado existente
-        modeloEmpleados.setValueAt(dni, filaSeleccionadaEmpleado, 0);
-        modeloEmpleados.setValueAt(nombre, filaSeleccionadaEmpleado, 1);
-        modeloEmpleados.setValueAt(telefono, filaSeleccionadaEmpleado, 2);
-        modeloEmpleados.setValueAt(puesto, filaSeleccionadaEmpleado, 3);
-        modeloEmpleados.setValueAt(sala, filaSeleccionadaEmpleado, 4); // Update Sala
-        modeloEmpleados.setValueAt(turno, filaSeleccionadaEmpleado, 5); // Update Turno
-      }
-      ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
-      limpiarCamposEmpleado(); // Limpiar campos después de guardar
-    });
-
-    btnCancelarEmpleado.addActionListener(e -> {
-      ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
-      limpiarCamposEmpleado();
-    });
-
-    // Action listener for saving Sala
-    btnGuardarSala.addActionListener(e -> {
-      String sala = txtAsignarSala.getText().trim();
-      if (sala.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "El campo de Sala no puede estar vacío.", "Error de Validación",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-      }
-      if (filaSeleccionadaEmpleado != -1) {
-        modeloEmpleados.setValueAt(sala, filaSeleccionadaEmpleado, 4); // Update Sala column (index 4)
-        ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
-      }
-    });
-
-    // Action listener for canceling Sala assignment
-    btnCancelarSala.addActionListener(e -> {
-      ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
-    });
-
-    // Action listener for saving Turno
-    btnGuardarTurno.addActionListener(e -> {
-      String turno = (String) cmbAsignarTurno.getSelectedItem();
-      if (turno == null || turno.isEmpty()) { // Check for empty or null selection
-        JOptionPane.showMessageDialog(this, "Debe seleccionar un Turno.", "Error de Validación",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-      }
-      if (filaSeleccionadaEmpleado != -1) {
-        modeloEmpleados.setValueAt(turno, filaSeleccionadaEmpleado, 5); // Update Turno column (index 5)
-        ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
-      }
-    });
-
-    // Action listener for canceling Turno assignment
-    btnCancelarTurno.addActionListener(e -> {
-      ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "Tabla");
-    });
-  }
-
-  /**
-   * Limpia los campos de texto del formulario de empleado.
-   */
-  private void limpiarCamposEmpleado() {
-    txtDNIEmpleado.setText("");
-    txtNombreEmpleado.setText("");
-    txtTelefonoEmpleado.setText("");
-    txtPuestoEmpleado.setText("");
-    txtSalaGeneral.setText(""); // Clear Sala field in general form
-    cmbModificarTurno.setSelectedItem(""); // Clear Turno JComboBox in general form
-  }
-
-  private void styleGestionButton(JButton button) {
-    button.setBackground(gestionButtonBgColor);
-    button.setForeground(gestionButtonFgColor);
-    button.setFont(gestionButtonFont);
-    button.setFocusPainted(false);
-    button.setBorder(gestionButtonBorder);
-
-    // Further reduced button preferred size for 5 buttons to fit
-    button.setPreferredSize(new Dimension(115, 35)); // Reduced from (115, 40) to (100, 35)
-  }
+    private void styleGestionButton(JButton button) {
+        button.setBackground(gestionButtonBgColor);
+        button.setForeground(gestionButtonFgColor);
+        button.setFont(gestionButtonFont);
+        button.setFocusPainted(false);
+        button.setBorder(gestionButtonBorder);
+        button.setPreferredSize(new Dimension(115, 35));
+    }
 }

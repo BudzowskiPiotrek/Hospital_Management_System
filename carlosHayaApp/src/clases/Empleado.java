@@ -14,6 +14,14 @@ public class Empleado extends Usuario {
 		return contrasena;
 	}
 
+	public int getSalaId() {
+		return salaId;
+	}
+
+	public void setSalaId(int salaId) {
+		this.salaId = salaId;
+	}
+
 	public void setContrasena(String contrasena) {
 		this.contrasena = contrasena;
 	}
