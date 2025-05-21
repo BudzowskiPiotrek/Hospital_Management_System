@@ -5,6 +5,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import clases.DBConnection;
+
 public class PanelLogin extends JPanel {
 
 	private JTextField usuarioField;
@@ -93,36 +95,49 @@ public class PanelLogin extends JPanel {
 		botonesPanel.add(registrarButton);
 
 		// Añadir todo al panel principal
-		setLayout(new GridLayout(4, 1,30, 30));
+		setLayout(new GridLayout(4, 1, 30, 30));
 		add(titlePanel);
 		add(usuarioPanel);
 		add(contrasenaPanel);
 		add(botonesPanel);
 
 		registrarButton.addActionListener(e -> panelImagen.cambiarPanel(new PanelRegistrar(panelImagen)));
+
 		iniciarButton.addActionListener(e -> {
 			String usuario = usuarioField.getText();
 			String contrasena = new String(contrasenaField.getPassword());
-			switchParaCambiarPanel(usuario, contrasena);
 
+			DBConnection db = new DBConnection();
+			String rol = db.iniciarSesion(usuario, contrasena);
+
+			// Llamada a método que devuelve rol o null
+			if (rol == null) {
+				JOptionPane.showMessageDialog(null, "Usuario no encontrado o error en la conexión.");
+			} else {
+				switch (rol) {
+				case "administrador":
+					panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
+					break;
+				case "administrativo":
+
+					break;
+				case "medico":
+					panelImagen.cambiarPanel(new PanelMedico(panelImagen));
+					break;
+				case "enfermero":
+
+					break;
+				case "mantenimiento":
+
+					break;
+
+				default:
+					JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rol);
+					break;
+				}
+			}
 		});
 
-	}
-
-	private void switchParaCambiarPanel(String usuario, String contrasena) {
-		switch (usuario) {
-		case "medico":
-			panelImagen.cambiarPanel(new PanelMedico(panelImagen));
-			break;
-		case "admin":
-			panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
-			break;
-		 default:
-			 JOptionPane.showMessageDialog(null, "Error: Introduce un usuario Valido!!");
-			 break;
-			
-
-		}
 	}
 
 	// Estilo de los botones

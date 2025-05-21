@@ -9,13 +9,14 @@ import java.sql.Statement;
 
 public class DBConnection {
 
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/"; // FALTA AÑADIR EL NOMBRE DE BASE DE DATOS
-	private static final String DB_USUARIO = ""; // CREO QUE ES ROOT POR DEFECTO PERO LO QUE PONDRA JAVI
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/appcarloshaya"; // FALTA AÑADIR EL NOMBRE DE BASE
+																						// DE DATOS
+	private static final String DB_USUARIO = "root"; // CREO QUE ES ROOT POR DEFECTO PERO LO QUE PONDRA JAVI
 	private static final String DB_CONTRASENIA = ""; // CONTRASEÑA DE BASE DATOS
 
 	private static Connection conn = null; // PARA TENER UNA UNICA CONEXION (MODO CONTROL)
 
-	private DBConnection() {
+	public DBConnection() {
 		// SE HACE UN CONSTRUCTOR VACIO PARA EVITAR LA ISTANCIA DIRECTA
 	}
 
@@ -38,17 +39,20 @@ public class DBConnection {
 
 	// -------------- GESTION DE LOGIN --------------
 
-	public String iniciarSesion(String dni) {
-		String sql = "SELECT rol FROM Usuario WHERE dni = '" + dni + "'";
+	public String iniciarSesion(String dni, String contrasena) {
+		String sql = "SELECT u.rol FROM Usuario u " + "JOIN Empleado e ON u.id = e.usuario_id "
+				+ "WHERE u.dni = ? AND e.contrasena = ?";
 		try {
 			conectar();
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, dni);
+			ps.setString(2, contrasena);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
 				return rs.getString("rol");
 			} else {
-				return null;
+				return null; // No coincide dni o contraseña
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -159,7 +163,7 @@ public class DBConnection {
 		try {
 			conectar();
 			Statement stmt = conn.createStatement();
-			
+
 			// PRIMERO SE MODIFICA LA APRTE DE USUARIO
 			String sqlUsuario = "UPDATE Usuario SET " + "nombre = '" + paciente.getNombre() + "', " + "apellido = '"
 					+ paciente.getApellido() + "' " + "WHERE dni = '" + paciente.getDni() + "'";
@@ -198,59 +202,60 @@ public class DBConnection {
 			desconectar();
 		}
 	}
-	
+
 	// -------------- GESTION DE SALAS --------------
-	
+
 	public boolean agregarSala(String tipo, boolean disponibilidad) {
-	    try {
-	        conectar();
-	        Statement stmt = conn.createStatement();
+		try {
+			conectar();
+			Statement stmt = conn.createStatement();
 
-	        String sql = "INSERT INTO Sala (tipo, disponibilidad) VALUES ('" + tipo + "', " + (disponibilidad ? 1 : 0) + ")";
-	        int filas = stmt.executeUpdate(sql);
+			String sql = "INSERT INTO Sala (tipo, disponibilidad) VALUES ('" + tipo + "', " + (disponibilidad ? 1 : 0)
+					+ ")";
+			int filas = stmt.executeUpdate(sql);
 
-	        return filas > 0;
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    } finally {
-	        desconectar();
-	    }
+			return filas > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
 	}
 
 	public boolean modificarSala(int id, String nuevoTipo, boolean nuevaDisponibilidad) {
-	    try {
-	        conectar();
-	        Statement stmt = conn.createStatement();
+		try {
+			conectar();
+			Statement stmt = conn.createStatement();
 
-	        String sql = "UPDATE Sala SET tipo = '" + nuevoTipo + "', disponibilidad = " + (nuevaDisponibilidad ? 1 : 0) + " WHERE id = " + id;
-	        int filas = stmt.executeUpdate(sql);
+			String sql = "UPDATE Sala SET tipo = '" + nuevoTipo + "', disponibilidad = " + (nuevaDisponibilidad ? 1 : 0)
+					+ " WHERE id = " + id;
+			int filas = stmt.executeUpdate(sql);
 
-	        return filas > 0;
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    } finally {
-	        desconectar();
-	    }
+			return filas > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
 	}
 
 	public boolean eliminarSala(int id) {
-	    try {
-	        conectar();
-	        Statement stmt = conn.createStatement();
+		try {
+			conectar();
+			Statement stmt = conn.createStatement();
 
-	        String sql = "DELETE FROM Sala WHERE id = " + id;
-	        int filas = stmt.executeUpdate(sql);
+			String sql = "DELETE FROM Sala WHERE id = " + id;
+			int filas = stmt.executeUpdate(sql);
 
-	        return filas > 0;
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    } finally {
-	        desconectar();
-	    }
+			return filas > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
 	}
-
 
 }
