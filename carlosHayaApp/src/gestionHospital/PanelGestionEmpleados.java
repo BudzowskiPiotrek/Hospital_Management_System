@@ -687,15 +687,10 @@ public class PanelGestionEmpleados extends JPanel {
         txtNombreEmpleado.setText("");
         txtApellidoEmpleado.setText("");
         txtPuestoEmpleado.setText("");
-        txtSalaGeneral.setText(""); // Ahora este campo es editable, también se limpia
+        txtSalaGeneral.setText(""); 
         // Limpiar campo de contraseña si está presente
-        JPasswordField passField = (JPasswordField) ((JPanel)txtDNIEmpleado.getParent()).getComponentAt(txtDNIEmpleado.getX(), txtDNIEmpleado.getY() + 50 * 2 + 50); // Intento de obtener la contraseña
-        // Una mejor forma de limpiar el campo de contraseña es tener una referencia directa a él si siempre está presente
-        // O removerlo y añadirlo de nuevo en cada caso.
-        // Para simplificar, asumimos que si está visible, se limpia.
-        // En este código, txtContrasena es una variable local en el constructor, lo que complica su acceso aquí.
-        // Para que `limpiarCamposEmpleado` pueda limpiar `txtContrasena`, `txtContrasena` DEBE ser una variable de instancia.
-        // Lo cambiaré para que sea una variable de instancia.
+        JPasswordField passField = (JPasswordField) ((JPanel)txtDNIEmpleado.getParent()).getComponentAt(txtDNIEmpleado.getX(), txtDNIEmpleado.getY() + 50 * 2 + 50);
+        
     }
 
     private JPasswordField txtContrasena; // Hacerla variable de instancia para limpiarla
