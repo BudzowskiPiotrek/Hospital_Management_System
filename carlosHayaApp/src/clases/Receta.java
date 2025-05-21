@@ -1,13 +1,15 @@
 package clases;
 
+import java.time.LocalDate;
+
 public class Receta {
 	private int id;
-	private int pacienteId;
-	private int medicoId;
+	private String pacienteId;
+	private String medicoId;
 	private String medicamentos; // lista como texto simple (ej: "Paracetamol, Ibuprofeno")
-	private String fecha; // yyyy-MM-dd
+	private LocalDate fecha; 
 
-	public Receta(int id, int pacienteId, int medicoId, String medicamentos, String fecha) {
+	public Receta(int id, String pacienteId, String medicoId, String medicamentos, LocalDate fecha) {
 		this.id = id;
 		this.pacienteId = pacienteId;
 		this.medicoId = medicoId;
@@ -23,19 +25,19 @@ public class Receta {
 		this.id = id;
 	}
 
-	public int getPacienteId() {
+	public String getPacienteId() {
 		return pacienteId;
 	}
 
-	public void setPacienteId(int pacienteId) {
+	public void setPacienteId(String pacienteId) {
 		this.pacienteId = pacienteId;
 	}
 
-	public int getMedicoId() {
+	public String getMedicoId() {
 		return medicoId;
 	}
 
-	public void setMedicoId(int medicoId) {
+	public void setMedicoId(String medicoId) {
 		this.medicoId = medicoId;
 	}
 
@@ -47,11 +49,12 @@ public class Receta {
 		this.medicamentos = medicamentos;
 	}
 
-	public String getFecha() {
+	public LocalDate getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(String fecha) {
+	public void setFecha(LocalDate fecha) {
 		this.fecha = fecha;
 	}
+
 }
