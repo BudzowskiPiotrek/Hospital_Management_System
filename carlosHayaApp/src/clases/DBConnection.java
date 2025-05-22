@@ -191,33 +191,33 @@ public class DBConnection {
 			desconectar();
 		}
 	}
-	
+
 	public boolean asignarSala(String empleadoDni, Integer salaId) {
-        conectar(); 
-        String salaIdValue;
-        if (salaId == null || salaId == 0) { 
-            salaIdValue = "NULL"; 
-        } else {
-            salaIdValue = String.valueOf(salaId); 
-        }
- 
-        String sql = "UPDATE Empleado SET sala_id = " + salaIdValue + " WHERE usuario_dni = '" + empleadoDni + "'";
-        
-        try (Statement stmt = conn.createStatement()) {
-            int filas = stmt.executeUpdate(sql);
-            if (filas > 0) {
-                System.out.println("Sala asignada/desasignada exitosamente.");
-            } else {
-                System.err.println("No se encontró el empleado para asignar/desasignar sala o no hubo cambios.");
-            }
-            return filas > 0;
-        } catch (SQLException e) {
-            System.err.println("Error al asignar sala: " + e.getMessage());
-            return false;
-        } finally {
-            desconectar(); // Desconectar al finalizar la operación
-        }
-    }
+		conectar();
+		String salaIdValue;
+		if (salaId == null || salaId == 0) {
+			salaIdValue = "NULL";
+		} else {
+			salaIdValue = String.valueOf(salaId);
+		}
+
+		String sql = "UPDATE Empleado SET sala_id = " + salaIdValue + " WHERE usuario_dni = '" + empleadoDni + "'";
+
+		try (Statement stmt = conn.createStatement()) {
+			int filas = stmt.executeUpdate(sql);
+			if (filas > 0) {
+				System.out.println("Sala asignada/desasignada exitosamente.");
+			} else {
+				System.err.println("No se encontró el empleado para asignar/desasignar sala o no hubo cambios.");
+			}
+			return filas > 0;
+		} catch (SQLException e) {
+			System.err.println("Error al asignar sala: " + e.getMessage());
+			return false;
+		} finally {
+			desconectar();
+		}
+	}
 
 	// -------------- GESTION DE PACIENTE --------------
 
@@ -225,8 +225,6 @@ public class DBConnection {
 		try {
 			conectar();
 			Statement stmt = conn.createStatement();
-
-			// SE INSERTA PRIMERO EN TABLA DE USUARIO
 			String sqlUsuario = "INSERT INTO Usuario (nombre, apellido, dni, rol) VALUES ('" + paciente.getNombre()
 					+ "', '" + paciente.getApellido() + "', '" + paciente.getDni() + "', 'paciente')";
 			int filasUsuario = stmt.executeUpdate(sqlUsuario);
@@ -235,9 +233,9 @@ public class DBConnection {
 				return false;
 			}
 
-			// POSTERIORMENTE SE INGRESA EN LA TABLA PACIENTE (USUARIO_ID ES EL DNI)
-			String sqlPaciente = "INSERT INTO Paciente (usuario_dni, contacto, obra_social) VALUES ('"
-					+ paciente.getDni() + "', '" + paciente.getContacto() + "', '" + paciente.getObraSocial() + "')";
+			String sqlPaciente = "INSERT INTO Paciente (usuario_dni, contacto, obra_social, alta, sala_id) VALUES ('"
+					+ paciente.getDni() + "', '" + paciente.getContacto() + "', '" + paciente.getObraSocial() + "', "
+					+ (paciente.isAlta() ? 1 : 0) + ", " + paciente.getSalaID() + ")";
 			int filasPaciente = stmt.executeUpdate(sqlPaciente);
 
 			return filasPaciente > 0;
@@ -254,7 +252,7 @@ public class DBConnection {
 			conectar();
 			Statement stmt = conn.createStatement();
 
-			// PRIMERO SE MODIFICA LA APRTE DE USUARIO
+			// PRIMERO SE MODIFICA LA PARTE DE USUARIO
 			String sqlUsuario = "UPDATE Usuario SET " + "nombre = '" + paciente.getNombre() + "', " + "apellido = '"
 					+ paciente.getApellido() + "' " + "WHERE dni = '" + paciente.getDni() + "'";
 
@@ -262,8 +260,8 @@ public class DBConnection {
 
 			// SEGUNDO SE MODIFICA LA PARTE DE PACIENTE
 			String sqlPaciente = "UPDATE Paciente SET " + "contacto = '" + paciente.getContacto() + "', "
-					+ "obra_social = '" + paciente.getObraSocial() + "' " + "WHERE usuario_dni = '" + paciente.getDni()
-					+ "'";
+					+ "obra_social = '" + paciente.getObraSocial() + "', " + "alta = " + (paciente.isAlta() ? 1 : 0)
+					+ ", " + "sala_id = " + paciente.getSalaID() + " WHERE usuario_dni = '" + paciente.getDni() + "'";
 
 			int filasPaciente = stmt.executeUpdate(sqlPaciente);
 
@@ -280,12 +278,88 @@ public class DBConnection {
 		try {
 			conectar();
 			Statement stmt = conn.createStatement();
-
+			// `ON DELETE CASCADE` asi que borra la otra tambien
 			String sql = "DELETE FROM Usuario WHERE dni = '" + dni + "'";
 
 			int filas = stmt.executeUpdate(sql);
 			return filas > 0;
 		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
+	}
+
+	public List<Paciente> obtenerTodosLosPacientes() {
+		List<Paciente> pacientes = new ArrayList<>();
+		conectar();
+		String sql = "SELECT u.dni, u.nombre, u.apellido, p.contacto, p.obra_social, p.sala_id "
+				+ "FROM Usuario u JOIN Paciente p ON u.dni = p.usuario_dni "
+				+ "WHERE u.rol = 'paciente' AND p.alta = 0";
+		try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+
+			while (rs.next()) {
+				String dni = rs.getString("dni");
+				String nombre = rs.getString("nombre");
+				String apellido = rs.getString("apellido");
+				String contacto = rs.getString("contacto");
+				String obraSocial = rs.getString("obra_social");
+				int salaId = rs.getInt("sala_id");
+				if (rs.wasNull()) {
+					salaId = 0;
+				}
+
+				pacientes.add(new Paciente(nombre, apellido, dni, "paciente", contacto, obraSocial, false, salaId));
+			}
+		} catch (SQLException e) {
+			System.err.println("Error al obtener pacientes: " + e.getMessage());
+		} finally {
+			desconectar();
+		}
+		return pacientes;
+	}
+
+	public boolean asignarSalaPaciente(String pacienteDni, Integer salaId) {
+		conectar();
+		String salaIdValue;
+		if (salaId == null || salaId == 0) {
+			salaIdValue = "NULL";
+		} else {
+			salaIdValue = String.valueOf(salaId);
+		}
+
+		String sql = "UPDATE Paciente SET sala_id = " + salaIdValue + " WHERE usuario_dni = '" + pacienteDni + "'";
+
+		try (Statement stmt = conn.createStatement()) {
+			int filas = stmt.executeUpdate(sql);
+			if (filas > 0) {
+				System.out.println("Sala asignada/desasignada al paciente exitosamente.");
+			} else {
+				System.err.println("No se encontró el paciente para asignar/desasignar sala o no hubo cambios.");
+			}
+			return filas > 0;
+		} catch (SQLException e) {
+			System.err.println("Error al asignar sala al paciente: " + e.getMessage());
+			return false;
+		} finally {
+			desconectar();
+		}
+	}
+
+	public boolean agregarDiagnostico(Diagnostico diagnostico) {
+		try {
+			conectar();
+			Statement stmt = conn.createStatement();
+
+			String sql = "INSERT INTO diagnostico (paciente_dni, medico_dni, descripcion, fecha) VALUES ('"
+					+ diagnostico.getPacienteId() + "', '" + diagnostico.getMedicoId() + "', '"
+					+ diagnostico.getDescripcion() + "', '" + diagnostico.getFecha().toString() + "')";
+
+			int filas = stmt.executeUpdate(sql);
+			return filas > 0;
+		} catch (SQLException e) {
+			System.err.println("Error al agregar diagnóstico: " + e.getMessage());
 			e.printStackTrace();
 			return false;
 		} finally {
