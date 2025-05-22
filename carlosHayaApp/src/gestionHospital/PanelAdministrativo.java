@@ -123,9 +123,9 @@ public class PanelAdministrativo extends JPanel {
   private void panelTitle() {
     panelTitulo = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel de título con FlowLayout
     panelTitulo.setBackground(colorbg); // Color de fondo del título
-    JLabel title = new JLabel("PANEL ADMINISTRATIVO"); // Texto del título
+    JLabel title = new JLabel("ADMINISTRATIVO"); // Texto del título
     title.setForeground(Color.decode("#F4D35E")); // Color del texto del título
-    title.setFont(new Font("Roboto", Font.BOLD, 20)); // Fuente del título
+    title.setFont(new Font("Roboto", Font.BOLD, 35)); // Fuente del título
     panelTitulo.add(title); // Añade el título al panel
     this.add(panelTitulo, BorderLayout.NORTH); // Añade el panel de título a la parte superior del
                                                // PanelAdministrativo

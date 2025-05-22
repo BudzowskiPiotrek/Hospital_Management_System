@@ -114,8 +114,8 @@ public class PanelMantenimiento extends JPanel {
         salaLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         salaPanel.add(salaLabel);
 
-        JRadioButton rbSi = new JRadioButton("Sí");
-        JRadioButton rbNo = new JRadioButton("No");
+        JRadioButton rbSi = new JRadioButton("Limpia");
+        JRadioButton rbNo = new JRadioButton("Pendiente");
         rbSi.setBackground(Color.WHITE);
         rbNo.setBackground(Color.WHITE);
         rbSi.setFont(new Font("Arial", Font.PLAIN, 16));

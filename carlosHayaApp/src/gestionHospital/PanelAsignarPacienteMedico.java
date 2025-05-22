@@ -31,20 +31,15 @@ public class PanelAsignarPacienteMedico extends JPanel {
   private Color mainPanelBgColor = Color.decode("#E3242B"); // Fondo del panel principal
   private Color cardsPanelBgColor = Color.decode("#B0E0E6"); // Fondo del panel con CardLayout
   private Color formPanelBgColor = Color.decode("#24e3dc"); // Fondo del formulario de asignación
-  private Color tableButtonsPanelBgColor = Color.decode("#212f3d"); // Fondo del panel de botones de la tabla
 
-  private Color gestionButtonBgColor = Color.decode("#CD7F32"); // Color de fondo de los botones de gestión
   private Color gestionButtonFgColor = Color.white; // Color de texto de los botones de gestión
   private Font gestionButtonFont = new Font("Arial", Font.BOLD, 15); // Fuente de los botones de gestión
-  private Border gestionButtonBorder = BorderFactory.createLineBorder(Color.decode("#CD7F32"), 1); // Borde de los
+  private Border gestionButtonBorder = BorderFactory.createLineBorder(Color.decode("#006D77"), 1); // Borde de los
                                                                                                    // botones de
                                                                                                    // gestión
 
   private Color titleFgColor = Color.white; // Color del texto del título principal
   private Color labelFgColor = Color.DARK_GRAY; // Color del texto de las etiquetas del formulario
-
-  private Color tableHeaderBg = Color.decode("#f2f2f2"); // Fondo del encabezado de la tabla
-  private Color tableHeaderFg = Color.decode("#333"); // Color de texto del encabezado de la tabla
 
   public PanelAsignarPacienteMedico() {
     this.setLayout(new BorderLayout());
@@ -80,18 +75,19 @@ public class PanelAsignarPacienteMedico extends JPanel {
     tablaMedicos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
     tablaMedicos.setBackground(Color.WHITE);
     tablaMedicos.setForeground(Color.BLACK);
-    tablaMedicos.getTableHeader().setBackground(tableHeaderBg);
-    tablaMedicos.getTableHeader().setForeground(tableHeaderFg);
+    tablaMedicos.getTableHeader().setBackground(Color.decode("#006D77"));
+    tablaMedicos.getTableHeader().setForeground(Color.white);
     JScrollPane scrollTablaMedicos = new JScrollPane(tablaMedicos);
     scrollTablaMedicos.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
     panelTablaMedicos.add(scrollTablaMedicos, BorderLayout.CENTER);
 
     JPanel panelBotonesTablaMedicos = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-    panelBotonesTablaMedicos.setBackground(tableButtonsPanelBgColor); // Fondo del panel de botones de tabla
+    panelBotonesTablaMedicos.setBackground(Color.decode("#728C69")); // Fondo del panel de botones de tabla
     btnAsignarPaciente = new JButton("Asignar Paciente");
     styleGestionButton(btnAsignarPaciente);
     // Anteriormente: btnAsignarPaciente.setEnabled(false);
     // ¡Ahora el botón siempre está habilitado!
+    btnAsignarPaciente.setBackground(Color.decode("#006D77"));
     panelBotonesTablaMedicos.add(btnAsignarPaciente);
     panelTablaMedicos.add(panelBotonesTablaMedicos, BorderLayout.SOUTH);
 
@@ -234,8 +230,8 @@ public class PanelAsignarPacienteMedico extends JPanel {
         ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "FormularioAsignacion");
       } else {
         // Mensaje JOptionPane si no hay médico seleccionado
-        JOptionPane.showMessageDialog(this, "Por favor, seleccione un médico de la tabla para asignar un paciente.",
-            "Error de Selección",
+        JOptionPane.showMessageDialog(this,
+            "Por favor, seleccione un médico de la tabla para asignar un paciente.", "Error de Selección",
             JOptionPane.WARNING_MESSAGE);
       }
     });
@@ -269,7 +265,7 @@ public class PanelAsignarPacienteMedico extends JPanel {
   }
 
   private void styleGestionButton(JButton button) {
-    button.setBackground(gestionButtonBgColor);
+    button.setBackground(Color.decode("#006D77"));
     button.setForeground(gestionButtonFgColor);
     button.setFont(gestionButtonFont); // Usa la fuente definida en la clase (Arial, BOLD, 15)
     button.setFocusPainted(false);
