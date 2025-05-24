@@ -323,8 +323,8 @@ public class DBConnection {
 	public boolean asignarSalaPaciente(String pacienteDni, Integer salaId) {
 		conectar();
 		String salaIdValue;
-		if (salaId == null || salaId == 0) {
-			salaIdValue = "NULL";
+		if (salaId == null || salaId == 0 ) {
+			salaIdValue = "0";
 		} else {
 			salaIdValue = String.valueOf(salaId);
 		}

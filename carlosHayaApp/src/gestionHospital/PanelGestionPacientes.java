@@ -54,7 +54,7 @@ public class PanelGestionPacientes extends JPanel {
 
 		// Initialize DBConnection
 		dbConnection = new DBConnection();
-
+		
 		JLabel titulo = new JLabel("Gestión de Pacientes", SwingConstants.CENTER);
 		titulo.setFont(new Font("Arial", Font.BOLD, 30));
 		titulo.setForeground(titleFgColor); // Aplicar color de texto del título
@@ -565,7 +565,7 @@ public class PanelGestionPacientes extends JPanel {
 			String habitacionNumStr = txtAsignarHabitacion.getText().trim();
 			Integer habitacionNum = null;
 
-			if (habitacionNumStr.isEmpty()) {
+			if (habitacionNumStr.isEmpty()||habitacionNumStr.equalsIgnoreCase("Libre")) {
 				habitacionNum = 0;
 			} else {
 				try {
@@ -623,7 +623,7 @@ public class PanelGestionPacientes extends JPanel {
 		List<Paciente> pacientes = dbConnection.obtenerTodosLosPacientes();
 		for (Paciente p : pacientes) {
 			modeloPacientes.addRow(new Object[] { p.getDni(), p.getNombre(), p.getApellido(), p.getContacto(),
-					p.getObraSocial(), p.getSalaID() == 0 ? "" : String.valueOf(p.getSalaID()) });
+					p.getObraSocial(), p.getDni(), p.getSalaID() == 0 ? "Libre" : String.valueOf(p.getSalaID()) });
 		}
 	}
 }
