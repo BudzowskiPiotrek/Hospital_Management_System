@@ -10,9 +10,11 @@ import javax.swing.border.EmptyBorder;
 class PanelDarCitas extends JPanel {
 
   // Campos del formulario declarados aquí para poder acceder a ellos
-  private JTextField dniField;
-  private JTextField dayField;
-  private JTextField timeField;
+  private JTextField dniMedicoField;
+  private JTextField dniPacienteField;
+  private JTextField fechaField;
+  private JTextField horaInicioField;
+  private JTextField horaFinField;
 
   public PanelDarCitas() {
     setLayout(new BorderLayout()); // Eliminado el espaciado horizontal y vertical para el panel principal
@@ -37,29 +39,45 @@ class PanelDarCitas extends JPanel {
     gbc.fill = GridBagConstraints.HORIZONTAL; // Los componentes se expanden horizontalmente
     gbc.weightx = 1.0; // Permitir que los campos de texto se expandan
 
-    // Campo para el DNI
+    // Campo para el DNI del Médico
     gbc.gridx = 0;
     gbc.gridy = 0;
-    fieldsPanel.add(new JLabel("DNI de la Persona:"), gbc);
-    dniField = new JTextField(20);
+    fieldsPanel.add(new JLabel("DNI del Médico:"), gbc);
+    dniMedicoField = new JTextField(20);
     gbc.gridx = 1;
-    fieldsPanel.add(dniField, gbc);
+    fieldsPanel.add(dniMedicoField, gbc);
 
-    // Campo para el Día
+    // Campo para el DNI del Paciente
     gbc.gridx = 0;
     gbc.gridy = 1;
-    fieldsPanel.add(new JLabel("Día (YYYY-MM-DD):"), gbc);
-    dayField = new JTextField(20);
+    fieldsPanel.add(new JLabel("DNI del Paciente:"), gbc);
+    dniPacienteField = new JTextField(20);
     gbc.gridx = 1;
-    fieldsPanel.add(dayField, gbc);
+    fieldsPanel.add(dniPacienteField, gbc);
 
-    // Campo para la Hora
+    // Campo para la Fecha
     gbc.gridx = 0;
     gbc.gridy = 2;
-    fieldsPanel.add(new JLabel("Hora (HH:MM):"), gbc);
-    timeField = new JTextField(20);
+    fieldsPanel.add(new JLabel("Fecha (DD-MM-YYYY):"), gbc);
+    fechaField = new JTextField(20);
     gbc.gridx = 1;
-    fieldsPanel.add(timeField, gbc);
+    fieldsPanel.add(fechaField, gbc);
+
+    // Campo para la Hora de Inicio
+    gbc.gridx = 0;
+    gbc.gridy = 3;
+    fieldsPanel.add(new JLabel("Hora de Inicio (HH:MM):"), gbc);
+    horaInicioField = new JTextField(20);
+    gbc.gridx = 1;
+    fieldsPanel.add(horaInicioField, gbc);
+
+    // Campo para la Hora de Fin
+    gbc.gridx = 0;
+    gbc.gridy = 4;
+    fieldsPanel.add(new JLabel("Hora de Fin (HH:MM):"), gbc);
+    horaFinField = new JTextField(20);
+    gbc.gridx = 1;
+    fieldsPanel.add(horaFinField, gbc);
 
     add(fieldsPanel, BorderLayout.CENTER); // Añadir el panel de campos al centro
 
@@ -73,25 +91,33 @@ class PanelDarCitas extends JPanel {
     saveButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        String dni = dniField.getText();
-        String day = dayField.getText();
-        String time = timeField.getText();
+        String dniMedico = dniMedicoField.getText();
+        String dniPaciente = dniPacienteField.getText();
+        String fecha = fechaField.getText();
+        String horaInicio = horaInicioField.getText();
+        String horaFin = horaFinField.getText();
 
-        if (dni.isEmpty() || day.isEmpty() || time.isEmpty()) {
+        if (dniMedico.isEmpty() || dniPaciente.isEmpty() || fecha.isEmpty() || horaInicio.isEmpty()
+            || horaFin.isEmpty()) {
           JOptionPane.showMessageDialog(PanelDarCitas.this, "Por favor, complete todos los campos.", "Campos Vacíos",
               JOptionPane.WARNING_MESSAGE);
         } else {
           JOptionPane.showMessageDialog(PanelDarCitas.this,
-              "Cita guardada para DNI: " + dni + ", Día: " + day + ", Hora: " + time, "Cita Guardada",
-              JOptionPane.INFORMATION_MESSAGE);
+              "Cita guardada:\n" +
+                  "DNI Médico: " + dniMedico + "\n" +
+                  "DNI Paciente: " + dniPaciente + "\n" +
+                  "Fecha: " + fecha + "\n" +
+                  "Hora de Inicio: " + horaInicio + "\n" +
+                  "Hora de Fin: " + horaFin,
+              "Cita Guardada", JOptionPane.INFORMATION_MESSAGE);
           clearFields(); // Limpiar campos después de guardar
         }
       }
     });
     buttonPanel.add(saveButton);
 
-    // Botón Cancelar
-    JButton cancelButton = new JButton("Borar");
+    // Botón Borrar
+    JButton cancelButton = new JButton("Borrar");
     styleButton(cancelButton, Color.decode("#C08080"));
     cancelButton.addActionListener(new ActionListener() {
       @Override
@@ -111,9 +137,11 @@ class PanelDarCitas extends JPanel {
    * Limpia los campos del formulario.
    */
   private void clearFields() {
-    dniField.setText("");
-    dayField.setText("");
-    timeField.setText("");
+    dniMedicoField.setText("");
+    dniPacienteField.setText("");
+    fechaField.setText("");
+    horaInicioField.setText("");
+    horaFinField.setText("");
   }
 
   private void styleButton(JButton button, Color bgColor) {

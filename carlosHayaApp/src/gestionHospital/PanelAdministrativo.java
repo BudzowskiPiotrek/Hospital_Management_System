@@ -24,7 +24,6 @@ public class PanelAdministrativo extends JPanel {
   // Paneles para cada funcionalidad específica del administrativo no
   // administrador
   private PanelConsultarDatosHospital panelConsultarDatosHospital;
-  private PanelAsignarPacienteMedico panelAsignarPacienteMedico;
   private PanelDarCitas panelDarCitas;
 
   public PanelAdministrativo(PanelImagen panelImagen) {
@@ -58,8 +57,11 @@ public class PanelAdministrativo extends JPanel {
    * funcionalidades del administrativo no administrador.
    */
   private void panelIzquierda() {
-    String[] buttonLabels = { "Consultar Datos", "Asignar Pacientes", "Dar Citas",
-        "Cerrar Sesión" }; // Definición de las etiquetas de los botones
+    String[] buttonLabels = { "Consultar Datos", "Dar Citas", "Cerrar Sesión" }; // Definición
+                                                                                 // de las
+                                                                                 // etiquetas
+                                                                                 // de los
+                                                                                 // botones
 
     // Se ha modificado el GridLayout para que el número de filas coincida con el
     // número de botones.
@@ -82,8 +84,6 @@ public class PanelAdministrativo extends JPanel {
           // Cambia el panel visible en el área de visualización según el botón clicado
           if (label.equals("Consultar Datos")) {
             mostrarPanel(panelConsultarDatosHospital);
-          } else if (label.equals("Asignar Pacientes")) {
-            mostrarPanel(panelAsignarPacienteMedico);
           } else if (label.equals("Dar Citas")) {
             mostrarPanel(panelDarCitas);
           } else if (label.equals("Cerrar Sesión")) {
@@ -113,7 +113,6 @@ public class PanelAdministrativo extends JPanel {
     // Inicializa las instancias de los paneles de funcionalidad para el
     // administrativo
     panelConsultarDatosHospital = new PanelConsultarDatosHospital();
-    panelAsignarPacienteMedico = new PanelAsignarPacienteMedico();
     panelDarCitas = new PanelDarCitas();
   }
 
