@@ -64,6 +64,38 @@ public class DBConnection {
 			desconectar();
 		}
 	}
+	
+	public boolean registrar(Empleado empleado) {
+		Statement stmt = null;
+		try {
+			conectar();
+			stmt = conn.createStatement();
+
+			String sqlUsuario = "INSERT INTO Usuario (nombre, apellido, dni, rol) VALUES ('" + empleado.getNombre()
+					+ "', '" + empleado.getApellido() + "', '" + empleado.getDni() + "', '" + empleado.getRol() + "')";
+			int filasUsuario = stmt.executeUpdate(sqlUsuario);
+
+			if (filasUsuario == 0) {
+				System.out.println("No se pudo insertar en la tabla Usuario.");
+				return false;
+			}
+
+			String sqlEmpleado = "INSERT INTO Empleado (usuario_dni, contrasena) VALUES ('" + empleado.getDni() + "', '"
+					+ empleado.getContrasena() + "')";
+
+			int filasEmpleado = stmt.executeUpdate(sqlEmpleado);
+
+			return filasEmpleado > 0;
+
+		} catch (SQLException e) {
+			System.out.println("Error al agregar empleado: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
+	}
+
 
 	// -------------- GESTION DE REGISTRAR --------------
 
