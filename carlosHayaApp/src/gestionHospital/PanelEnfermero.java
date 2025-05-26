@@ -1,11 +1,10 @@
 // Archivo: PanelEnfermero.java
 package gestionHospital;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
 import javax.swing.border.Border;
+
 
 public class PanelEnfermero extends JPanel {
     private final PanelImagen panelImagen;
@@ -101,12 +100,9 @@ public class PanelEnfermero extends JPanel {
     }
 
     private void cambiarAlInicio(JButton button) {
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                button.setBackground(Color.decode("#FF6347"));
-                panelImagen.cambiarPanel(new PanelLogin(panelImagen));
-            }
+        button.addActionListener(e -> {
+            button.setBackground(Color.decode("#FF6347"));
+            panelImagen.cambiarPanel(new PanelLogin(panelImagen));
         });
     }
 
@@ -127,4 +123,5 @@ public class PanelEnfermero extends JPanel {
         button.setFont(new Font("Arial", Font.BOLD, 18));
         button.setFocusPainted(false);
         button.setBorder(border);
-    }}
+    }
+}

@@ -7,7 +7,8 @@ import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
 
 class PanelAsignarCama extends JPanel {
-    private JComboBox<String> pacientesCombo;
+     private JTextField txtBuscar;
+    private JButton btnBuscar;
     private JComboBox<String> camasCombo;
 
     public PanelAsignarCama() {
@@ -18,32 +19,61 @@ class PanelAsignarCama extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 24));
         add(title, BorderLayout.NORTH);
 
-        JPanel form = new JPanel(new GridLayout(2, 2, 10, 10));
-        form.add(new JLabel("Paciente:"));
-        pacientesCombo = new JComboBox<>(new String[]{"Paciente A","Paciente B","Paciente C"});
-        form.add(pacientesCombo);
+        // Panel búsqueda y formulario
+        JPanel topPanel = new JPanel(new BorderLayout(10, 10));
+        txtBuscar = new JTextField();
+        btnBuscar = new JButton("Buscar paciente");
+        topPanel.add(txtBuscar, BorderLayout.CENTER);
+        topPanel.add(btnBuscar, BorderLayout.EAST);
+        add(topPanel, BorderLayout.NORTH);
 
+        JPanel form = new JPanel(new GridLayout(1, 2, 10, 10));
+        camasCombo = new JComboBox<>(new String[] {"Cama 1","Cama 2","Cama 3"});
         form.add(new JLabel("Cama disponible:"));
-        camasCombo = new JComboBox<>(new String[]{"Cama 1","Cama 2","Cama 3"});
         form.add(camasCombo);
         add(form, BorderLayout.CENTER);
 
-        JButton btnAsignar = new JButton("Asignar");
-        btnAsignar.setFont(new Font("Arial", Font.BOLD, 16));
-        btnAsignar.addActionListener(new ActionListener() {
+        btnBuscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String paciente = (String) pacientesCombo.getSelectedItem();
-                String cama = (String) camasCombo.getSelectedItem();
-                JOptionPane.showMessageDialog(
-                    PanelAsignarCama.this,
-                    "Asignada la " + cama + " al paciente " + paciente,
-                    "Asignación completada",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
+                String query = txtBuscar.getText().trim();
+                if (query.isEmpty()) {
+                    JOptionPane.showMessageDialog(PanelAsignarCama.this, "Introduce nombre o ID.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                String[] resultados = buscarPacientes(query);
+                if (resultados.length == 0) {
+                    JOptionPane.showMessageDialog(PanelAsignarCama.this, "No se encontró paciente.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    String paciente = (String) JOptionPane.showInputDialog(
+                        PanelAsignarCama.this,
+                        "Selecciona paciente:",
+                        "Resultados de búsqueda",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        resultados,
+                        resultados[0]
+                    );
+                    if (paciente != null) {
+                        asignarCama(paciente, (String) camasCombo.getSelectedItem());
+                    }
+                }
             }
         });
-        JPanel btnPanel = new JPanel(); btnPanel.add(btnAsignar);
-        add(btnPanel, BorderLayout.SOUTH);
-}
+    }
+
+    private String[] buscarPacientes(String query) {
+        // TODO: reemplazar con lógica real de búsqueda
+        return new String[] { query + " (ID123)" };
+    }
+
+    private void asignarCama(String paciente, String cama) {
+        // TODO: lógica real de asignación
+        JOptionPane.showMessageDialog(
+            this,
+            "Asignada " + cama + " a " + paciente,
+            "Asignación completada",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
 }
