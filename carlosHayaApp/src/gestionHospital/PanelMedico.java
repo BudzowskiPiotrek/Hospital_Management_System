@@ -52,7 +52,7 @@ public class PanelMedico extends JPanel {
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding de 10px en todos los lados
 
         // Panel Opcion (Oeste)
-        JPanel opcionPanel = new JPanel(new GridLayout(5, 5, 10, 10)); // Establecer el espacio entre botones
+        JPanel opcionPanel = new JPanel(new GridLayout(6, 1, 10, 10)); // Establecer el espacio entre botones
         opcionPanel.setPreferredSize(new Dimension(230, 550));
         opcionPanel.setBackground(colorbg); // Establecer el color de fondo a #212f3d
 
@@ -61,7 +61,7 @@ public class PanelMedico extends JPanel {
         infoPanel.setBackground(Color.WHITE); // Establecer el color de fondo a blanco (para cambios dinámicos)
 
         // Botones para el Panel Opcion
-        String[] buttonLabels = { "Ver pacientes asignados", "Historial medico", "Registrar diagnostico", "Recetar medicacion",
+        String[] buttonLabels = { "Ver pacientes asignados", "Historial medico", "Registrar diagnostico", "Recetar medicacion", "Ver citas médicas",
                 "|| Cerrar Sesión ||" };
         for (String buttonLabel : buttonLabels) {
             JButton button = new JButton(buttonLabel);
@@ -87,7 +87,8 @@ public class PanelMedico extends JPanel {
         infoPanel.add(new PanelVerHistorialMedico(), "Panel2"); // Historial médico
         infoPanel.add(new PanelRegistrarDiagnostico(), "Panel3"); // Diagnóstico
         infoPanel.add(new PanelRecetarMedicacion(), "Panel4"); // Recetar medicación
-        infoPanel.add(new JPanel(), "Panel5"); // Cierre sesión u otro
+        infoPanel.add(new PanelVerCitasMedicas(), "Panel5");
+        infoPanel.add(new JPanel(), "Panel6"); // Cierre sesión u otro
 
         // Añadir espacio entre el opcionPanel y el infoPanel (espacio de 10px)
         JPanel spacer = new JPanel();
@@ -138,8 +139,11 @@ public class PanelMedico extends JPanel {
             case "Recetar medicacion":
                 panelName = "Panel4"; // Panel correspondiente a "Recetar Medicación"
                 break;
+            case "Ver citas médicas":
+            	panelName = "Panel5";
+            	break;
             default:
-                panelName = "Panel5"; // Panel por defecto para "Cerrar Sesión"
+                panelName = "Panel6"; // Panel por defecto para "Cerrar Sesión"
                 break;
         }
 
