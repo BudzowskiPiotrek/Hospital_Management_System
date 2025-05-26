@@ -323,7 +323,7 @@ public class DBConnection {
 	public boolean asignarSalaPaciente(String pacienteDni, Integer salaId) {
 		conectar();
 		String salaIdValue;
-		if (salaId == null || salaId == 0 ) {
+		if (salaId == null || salaId == 0) {
 			salaIdValue = "0";
 		} else {
 			salaIdValue = String.valueOf(salaId);
@@ -419,6 +419,46 @@ public class DBConnection {
 			return false;
 		} finally {
 			desconectar();
+		}
+	}
+
+	public List<Sala> obtenerTodasLasSalas() {
+		List<Sala> salas = new ArrayList<>();
+		conectar();
+		String sql = "SELECT id, tipo, disponibilidad FROM Sala";
+		try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String tipo = rs.getString("tipo");
+				boolean disponibilidad = rs.getBoolean("disponibilidad");
+
+				salas.add(new Sala(id, tipo, disponibilidad));
+			}
+		} catch (SQLException e) {
+			System.err.println("Error al obtener salas: " + e.getMessage());
+		} finally {
+			desconectar();
+		}
+		return salas;
+	}
+
+	public boolean agregarTurnoMantenimiento(String empleadoDni, int salaId, Date fecha) {
+		try {
+			conectar();
+			Statement stmt = conn.createStatement();
+
+			String sql = "INSERT INTO TurnoMantenimiento (empleado_dni, sala_id, fecha) VALUES ('" + empleadoDni + "', "
+					+ salaId + ", '" + fecha.toString() + "')";
+			int filas = stmt.executeUpdate(sql);
+
+			return filas > 0;
+		} catch (SQLException e) {
+			System.err.println("Error al agregar turno de mantenimiento: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar(); 
 		}
 	}
 
