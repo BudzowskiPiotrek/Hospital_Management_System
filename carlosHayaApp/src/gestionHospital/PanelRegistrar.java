@@ -6,11 +6,16 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import clases.DBConnection;
+import clases.Empleado;
+
 public class PanelRegistrar extends JPanel {
     private PanelImagen panelIamgen;
     private Border border = BorderFactory.createLineBorder(Color.black, 2);
+	private DBConnection dbConnection;
 
     public PanelRegistrar(PanelImagen panelIamgen) {
+    	this.dbConnection = new DBConnection();
         this.panelIamgen = panelIamgen;
         setPreferredSize(new Dimension(450, 450));
         setBackground(Color.decode("#212f3d"));
@@ -50,7 +55,7 @@ public class PanelRegistrar extends JPanel {
         JLabel rolLabel = new JLabel("Rol:");
         rolLabel.setFont(labelFont);
         rolLabel.setForeground(labelColor);
-        String[] roles = { "Seleccionar", "Médico", "Enfermero", "Administrativo", "Otro" };
+        String[] roles = { "administrador", "administrativo", "medico", "mantedimiento" };
         JComboBox<String> rolComboBox = new JComboBox<>(roles);
         rolComboBox.setPreferredSize(new Dimension(184, 25));
         rolComboBox.setFocusable(false);
@@ -156,8 +161,23 @@ public class PanelRegistrar extends JPanel {
                 JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Registro exitoso",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                // Aquí puedes continuar con guardar los datos, por ejemplo en una base de datos
-                // o archivo
+                try {
+                    Empleado nuevoEmpleado = new Empleado(0, nombre, apellido, usuario, rol, contrasena);
+
+                    if (dbConnection.registrar(nuevoEmpleado)) {
+                        JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Registro exitoso",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        panelIamgen.cambiarPanel(new PanelLogin(panelIamgen)); // Volver al login después del registro
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Error al registrar el usuario. El DNI/NIE podría ya existir o hubo un problema en la base de datos.", "Error de registro",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Ha ocurrido un error inesperado: " + ex.getMessage(), "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+            
                 panelIamgen.cambiarPanel(new PanelLogin(panelIamgen));
             }
 
