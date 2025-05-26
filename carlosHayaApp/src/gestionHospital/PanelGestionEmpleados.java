@@ -458,23 +458,19 @@ public class PanelGestionEmpleados extends JPanel {
 
 		// Action listener for "Asignar Turnos"
 		btnAsignarTurnos.addActionListener(e -> {
-			filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow(); 
-			((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "AsignarTurno");
-			txtDniPacienteTurno.setText("");
-			txtDiaTurno.setText("");
-			txtHoraComienzoTurno.setText("");
-			txtHoraFinalTurno.setText("");
+		    filaSeleccionadaEmpleado = tablaEmpleados.getSelectedRow();
+		    if (filaSeleccionadaEmpleado != -1) { 
+		        ((CardLayout) cardsPanel.getLayout()).show(cardsPanel, "AsignarTurno");
+		        txtDniPacienteTurno.setText("");
+		        txtDiaTurno.setText("");
+		        txtHoraComienzoTurno.setText("");
+		        txtHoraFinalTurno.setText("");
 
-			if (filaSeleccionadaEmpleado != -1) {
-				// Pre-rellenar el DNI del empleado seleccionado si hay una fila
-				txtDniEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
-			} else {
-				// Si no hay empleado seleccionado, dejar el DNI del empleado vacío
-				txtDniEmpleadoTurno.setText("");
-				JOptionPane.showMessageDialog(this,
-						"No se ha seleccionado ningún empleado. Por favor, introduzca el DNI del empleado manualmente.",
-						"Información", JOptionPane.INFORMATION_MESSAGE);
-			}
+		        txtDniEmpleadoTurno.setText(modeloEmpleados.getValueAt(filaSeleccionadaEmpleado, 0).toString());
+		    } else {
+		        JOptionPane.showMessageDialog(this, "Seleccione un empleado para asignar un turno.", "Error",
+		                JOptionPane.WARNING_MESSAGE);
+		    }
 		});
 
 		// Action listener for "Asignar Salas"
