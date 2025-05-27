@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +66,7 @@ public class DBConnection {
 			desconectar();
 		}
 	}
-	
+
 	public boolean registrar(Empleado empleado) {
 		Statement stmt = null;
 		try {
@@ -96,7 +98,6 @@ public class DBConnection {
 		}
 	}
 
-
 	// -------------- GESTION DE REGISTRAR --------------
 
 	// ########################### CLASE ADMINISTRADOR ###########################
@@ -117,8 +118,8 @@ public class DBConnection {
 				return false;
 			}
 			// POSTERIORMENTE SE INGRESA EN LA TABLA EMPLEADO (USUARIO_ID ES EL DNI)
-			String sqlEmpleado = "INSERT INTO Empleado (usuario_dni, contrasena, sala_id) VALUES ('" + empleado.getDni() + "', '"
-					+ empleado.getContrasena() + "', '" + empleado.getSalaId() + "')";
+			String sqlEmpleado = "INSERT INTO Empleado (usuario_dni, contrasena, sala_id) VALUES ('" + empleado.getDni()
+					+ "', '" + empleado.getContrasena() + "', '" + empleado.getSalaId() + "')";
 			int filasEmpleado = stmt.executeUpdate(sqlEmpleado);
 
 			return filasEmpleado > 0;
@@ -223,6 +224,7 @@ public class DBConnection {
 			desconectar();
 		}
 	}
+	
 
 	public boolean asignarSala(String empleadoDni, Integer salaId) {
 		conectar();
@@ -490,9 +492,229 @@ public class DBConnection {
 			e.printStackTrace();
 			return false;
 		} finally {
-			desconectar(); 
+			desconectar();
 		}
 	}
 
 	// ########################### CLASE ADMINISTRATIVO ###########################
+	public List<Turno> obtenerTodosLosTurnos() {
+		List<Turno> turnos = new ArrayList<>();
+		conectar();
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "SELECT id,empleado_dni, paciente_dni, dia, hora_inicio, hora_fin FROM turno";
+			ResultSet rs = stat.executeQuery(sql);
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String empleadoDNI = rs.getString("empleado_dni");
+				String pacienteDNI = rs.getString("paciente_dni");
+				String fecha = rs.getString("dia");
+				LocalDate fechaCambiada = transformarFecha(fecha);
+
+				String hora_inicio = rs.getString("hora_inicio");
+				LocalTime hora_inicioCambiada = transformarHora(hora_inicio);
+
+				String hora_fin = rs.getString("hora_fin");
+				LocalTime hora_finCambiada = transformarHora(hora_fin);
+
+				turnos.add(
+						new Turno(id, empleadoDNI, pacienteDNI, fechaCambiada, hora_inicioCambiada, hora_finCambiada));
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			desconectar();
+		}
+
+		return turnos;
+	}
+
+	public LocalTime transformarHora(String horas) {
+		int hora = Integer.parseInt(horas.substring(0, horas.indexOf(":")));
+		int min = Integer.parseInt(horas.substring(horas.indexOf(":") + 1, horas.lastIndexOf(":")));
+		int seg = Integer.parseInt(horas.substring(horas.lastIndexOf(":") + 1));
+		return LocalTime.of(hora, min, seg);
+	}
+
+	public LocalDate transformarFecha(String fecha) {
+		int anio = Integer.parseInt(fecha.substring(0, fecha.indexOf("-")));
+		int mes = Integer.parseInt(fecha.substring(fecha.indexOf("-") + 1, fecha.lastIndexOf("-")));
+		int dia = Integer.parseInt(fecha.substring(fecha.lastIndexOf("-") + 1));
+		return LocalDate.of(anio, mes, dia);
+
+	}
+
+	/*
+	 * ######################################## MEDICO
+	 * ##################################
+	 */
+
+	public boolean asignarTurno(Turno t) {
+		conectar();
+		if (conn == null)
+			return false;
+
+		String sql = "INSERT INTO turno (empleado_dni, paciente_dni, dia, hora_inicio, hora_fin) VALUES (?, ?, ?, ?, ?)";
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, t.getMedicoDni());
+			pstmt.setString(2, t.getPacienteDni());
+			pstmt.setDate(3, Date.valueOf(t.getDia()));
+			pstmt.setTime(4, Time.valueOf(t.getHoraInicio()));
+			pstmt.setTime(5, Time.valueOf(t.getHoraFin()));
+
+			int filas = pstmt.executeUpdate();
+			if (filas > 0) {
+				System.out.println("Turno asignado exitosamente.");
+			} else {
+				System.err.println("No se pudo asignar el turno.");
+			}
+			return filas > 0;
+		} catch (SQLException e) {
+			System.err.println("Error al asignar turno: " + e.getMessage());
+			return false;
+		} finally {
+			desconectar();
+		}
+	}
+	public boolean registrarReceta(Receta r) {
+		try {
+			conectar();
+			Statement stat = conn.createStatement();
+			String sql = "INSERT INTO receta(paciente_dni,medico_dni,medicamentos,fecha) VALUE ('" + r.getPacienteId()
+					+ "','" + r.getMedicoId() + "','" + r.getMedicamentos() + "','" + r.getFecha() + "')";
+			int filas = stat.executeUpdate(sql);
+			return filas > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
+
+	}
+
+	public ArrayList<Object[][]> mostrarHistorialPaciente(String idMedico) {
+		String dni = "", nombre = "", apellido = "", contacto = "", obra = "", medicamentos = "", fecha_receta = "",
+				descripcion = "", fecha_diagnostico = "";
+		ArrayList<Object[][]> datosObjectos = new ArrayList<>();
+		try {
+			conectar();
+			Statement stat = conn.createStatement();
+			String sql1 = "SELECT usuario.dni, usuario.nombre, usuario.apellido, paciente.contacto, paciente.obra_social, receta.medicamentos, receta.fecha, diagnostico.descripcion, diagnostico.fecha\r\n"
+					+ "FROM usuario INNER JOIN paciente\r\n" + "ON usuario.dni=paciente.usuario_dni\r\n"
+					+ "INNER JOIN receta\r\n" + "ON paciente.usuario_dni=receta.paciente_dni\r\n"
+					+ "INNER JOIN diagnostico\r\n" + "ON paciente.usuario_dni = diagnostico.paciente_dni\r\n"
+					+ "INNER JOIN turno\r\n" + "ON paciente.usuario_dni = turno.paciente_dni\r\n"
+					+ "WHERE turno.empleado_dni = '" + idMedico + "';";
+			Statement stat1 = conn.createStatement();
+			ResultSet rs1 = stat1.executeQuery(sql1);
+
+			while (rs1.next()) {
+				dni = rs1.getString("usuario.dni");
+				nombre = rs1.getString("usuario.nombre");
+				apellido = rs1.getString("usuario.apellido");
+				contacto = rs1.getString("paciente.contacto");
+				obra = rs1.getString("paciente.obra_social");
+				medicamentos = rs1.getString("receta.medicamentos");
+				fecha_receta = rs1.getString("receta.fecha");
+				descripcion = rs1.getString("diagnostico.descripcion");
+				fecha_diagnostico = rs1.getString("diagnostico.fecha");
+				Object[][] datos = { { dni, nombre, apellido, contacto, obra, medicamentos, fecha_receta, descripcion,
+						fecha_diagnostico } };
+				datosObjectos.add(datos);
+			}
+			rs1.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return datosObjectos;
+	}
+
+	public ArrayList<Object[][]> pacientesAsignados(String idMedico) {
+		String dni = "", nombre = "", apellido = "", contacto = "", obra = "";
+		int salaId = 0;
+		ArrayList<Object[][]> datosObjectos = new ArrayList<>();
+		try {
+			conectar();
+			Statement stat = conn.createStatement();
+			String sql1 = "SELECT usuario.dni, usuario.nombre, usuario.apellido, paciente.contacto, paciente.obra_social, paciente.sala_id\r\n"
+					+ "FROM usuario INNER JOIN paciente\r\n" + "ON usuario.dni=paciente.usuario_dni\r\n"
+					+ "INNER JOIN turno\r\n" + "ON paciente.usuario_dni = turno.paciente_dni\r\n"
+					+ "WHERE turno.empleado_dni = '" + idMedico + "';";
+			Statement stat1 = conn.createStatement();
+			ResultSet rs1 = stat1.executeQuery(sql1);
+
+			while (rs1.next()) {
+				dni = rs1.getString("usuario.dni");
+				nombre = rs1.getString("usuario.nombre");
+				apellido = rs1.getString("usuario.apellido");
+				contacto = rs1.getString("paciente.contacto");
+				obra = rs1.getString("paciente.obra_social");
+				salaId = rs1.getInt("paciente.sala_id");
+				Object[][] datos = {
+						{ dni, nombre, apellido, contacto, obra, salaId == 0 ? "Libre" : String.valueOf(salaId) } };
+				datosObjectos.add(datos);
+			}
+			rs1.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return datosObjectos;
+	}
+
+	public String verificarRol(String dni) {
+		conectar();
+		String rol = "";
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "SELECT rol FROM usuario WHERE dni='" + dni + "';";
+			ResultSet rs = stat.executeQuery(sql);
+
+			if (rs.next()) {
+				rol = rs.getString("rol");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return rol;
+	}
+
+	public List<Turno> obtenerCitasMedicos(String idMedico) {
+		List<Turno> turnos = new ArrayList<>();
+		conectar();
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "SELECT id,paciente_dni, dia, hora_inicio, hora_fin FROM turno WHERE empleado_dni='" + idMedico
+					+ "';";
+			ResultSet rs = stat.executeQuery(sql);
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String pacienteDNI = rs.getString("paciente_dni");
+				String fecha = rs.getString("dia");
+				LocalDate fechaCambiada = transformarFecha(fecha);
+
+				String hora_inicio = rs.getString("hora_inicio");
+				LocalTime hora_inicioCambiada = transformarHora(hora_inicio);
+
+				String hora_fin = rs.getString("hora_fin");
+				LocalTime hora_finCambiada = transformarHora(hora_fin);
+
+				turnos.add(new Turno(id, idMedico, pacienteDNI, fechaCambiada, hora_inicioCambiada, hora_finCambiada));
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			desconectar();
+		}
+
+		return turnos;
+	}
+
 }

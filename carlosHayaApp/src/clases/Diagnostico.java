@@ -3,26 +3,16 @@ package clases;
 import java.time.LocalDate;
 
 public class Diagnostico {
-	private int id;
 	private String pacienteId;
 	private String medicoId;
 	private String descripcion;
 	private LocalDate fecha; // yyyy-MM-dd
 
-	public Diagnostico(int id, String pacienteId, String medicoId, String descripcion, LocalDate fecha) {
-		this.id = id;
+	public Diagnostico( String pacienteId, String medicoId, String descripcion, LocalDate fecha) {
 		this.pacienteId = pacienteId;
 		this.medicoId = medicoId;
 		this.descripcion = descripcion;
 		this.fecha = fecha;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getPacienteId() {

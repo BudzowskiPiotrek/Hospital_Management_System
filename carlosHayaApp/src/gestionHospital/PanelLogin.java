@@ -104,6 +104,7 @@ public class PanelLogin extends JPanel {
 		iniciarButton.addActionListener(e -> {
 			String usuario = usuarioField.getText();
 			String contrasena = new String(contrasenaField.getPassword());
+			Sesion.setUsuarioLogueado(usuario);
 
 			DBConnection db = new DBConnection();
 			String rol = db.iniciarSesion(usuario, contrasena);
