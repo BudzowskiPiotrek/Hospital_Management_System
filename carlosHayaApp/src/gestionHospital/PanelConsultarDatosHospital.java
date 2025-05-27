@@ -1,21 +1,11 @@
 package gestionHospital;
 
-
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
-import clases.DBConnection;
-import clases.Empleado;
-import clases.Paciente;
-import clases.Sala;
-import clases.Turno;
 
 @SuppressWarnings("serial")
 class PanelConsultarDatosHospital extends JPanel {
@@ -26,12 +16,8 @@ class PanelConsultarDatosHospital extends JPanel {
   private JPanel panelLabel;
   private JPanel panelTable;
   private JPanel panelFilter;
-  private DBConnection db;
 
   public PanelConsultarDatosHospital() {
-	//Se inicializa la conexión con la base de datos
-	    db = new DBConnection(); 
-	  
     setLayout(new BorderLayout()); // Eliminado el espaciado horizontal y vertical
     setBackground(Color.decode("#212f3d")); // Color de fondo general del panel
     setBorder(new EmptyBorder(15, 15, 15, 15)); // Más espaciado interno
@@ -84,8 +70,6 @@ class PanelConsultarDatosHospital extends JPanel {
     panelFilter.setPreferredSize(new Dimension(panelFilter.getPreferredSize().width, 80)); // Altura de 80px
     add(panelFilter, BorderLayout.SOUTH); // Añadir el panelFilter al SOUTH
 
-    
-    
     // Listener para el botón de cargar datos
     loadButton.addActionListener(new ActionListener() {
       @Override
@@ -104,73 +88,37 @@ class PanelConsultarDatosHospital extends JPanel {
 
     // Actualizar el texto del título según el tipo de dato cargado
     titleLabel.setText("Consulta de Datos de " + dataType);
-    
-  //Se inicializa la conexión con la base de datos
-    db = new DBConnection();
 
     switch (dataType) {
       case "Empleados":
-    	
-        tableModel.setColumnIdentifiers(new String[] { "DNI Empleado", "Nombre", "Apellido", "Rol", "ID Sala" });
-        // Carga las filas de datos de los empleados
-        cargaDatosEmpleados();
-        
+        tableModel.setColumnIdentifiers(new String[] { "ID Empleado", "Nombre", "Puesto", "Departamento" });
+        // Datos de ejemplo
+        tableModel.addRow(new Object[] { "E001", "Dr. Juan Pérez", "Médico", "Cardiología" });
+        tableModel.addRow(new Object[] { "E002", "Enf. Ana García", "Enfermera", "UCI" });
+        tableModel.addRow(new Object[] { "E003", "Adm. Laura López", "Administrativo", "Recepción" });
         break;
       case "Pacientes":
-        tableModel.setColumnIdentifiers(new String[] { "DNI Paciente", "Nombre", "Apellido", "Contacto", "Obra social", "ID Sala" });
-        // Carga las filas de datos de los pacientes
-        cargaDatosPacientes();
+        tableModel.setColumnIdentifiers(new String[] { "ID Paciente", "Nombre", "Edad", "Médico Asignado" });
+        // Datos de ejemplo
+        tableModel.addRow(new Object[] { "P001", "María Fernández", 45, "Dr. Juan Pérez" });
+        tableModel.addRow(new Object[] { "P002", "Carlos Ruiz", 28, "Dr. Elena Soto" });
         break;
       case "Salas":
-        tableModel.setColumnIdentifiers(new String[] { "ID Sala", "Tipo",  "Disponibilidad" });
-        // Carga las filas de datos de las salas
-        cargaDatosSala();
+        tableModel.setColumnIdentifiers(new String[] { "ID Sala", "Tipo", "Capacidad", "Disponibilidad" });
+        // Datos de ejemplo
+        tableModel.addRow(new Object[] { "S101", "Consulta", 1, "Disponible" });
+        tableModel.addRow(new Object[] { "S205", "Quirófano", 5, "Ocupado" });
         break;
       case "Citas":
-        tableModel.setColumnIdentifiers(new String[] { "ID Cita", "Paciente", "Médico", "Fecha", "Hora_Inicio", "Hora_Fin" });
-        // Carga las filas de datos de los turnos
-        cargaDatosTurno();
+        tableModel.setColumnIdentifiers(new String[] { "ID Cita", "Paciente", "Médico", "Fecha", "Hora" });
+        // Datos de ejemplo
+        tableModel.addRow(new Object[] { "C001", "María Fernández", "Dr. Juan Pérez", "2025-05-22", "10:00" });
+        tableModel.addRow(new Object[] { "C002", "Carlos Ruiz", "Dr. Elena Soto", "2025-05-22", "11:30" });
         break;
     }
   }
 
-  private void cargaDatosSala() {
-	ArrayList<Sala> salas = (ArrayList<Sala>) db.obtenerTodasLasSalas();
-	for(Sala s : salas) {
-		if(s.isDisponibilidad()) {
-			tableModel.addRow(new Object[] {s.getId(), s.getTipo(), "disponible"});
-		}else {
-			tableModel.addRow(new Object[] {s.getId(), s.getTipo(), "no disponible"});
-		}
-	}
-	
-}
-
-private void cargaDatosTurno() {
-	  ArrayList<Turno> turnos = (ArrayList<Turno>) db.obtenerTodosLosTurnos();
-	  for(Turno t : turnos) {
-		  tableModel.addRow(new Object[] {t.getId(),t.getPacienteDni(),t.getMedicoDni(),t.getDia(),t.getHoraInicio(),t.getHoraFin()});
-	  }
-	
-}
-
-private void cargaDatosPacientes() {
-	  ArrayList<Paciente> pacientes = (ArrayList<Paciente>) db.obtenerTodosLosPacientes();
-	  for(Paciente p : pacientes) {
-		  tableModel.addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),p.getContacto(),p.getObraSocial(),p.getSalaID() == 0 ? "Libre" : String.valueOf(p.getSalaID())});
-	  }
-	
-}
-
-private void cargaDatosEmpleados() {
-	  ArrayList<Empleado> empleados = (ArrayList<Empleado>) db.obtenerTodosLosEmpleados();
-	  for(Empleado e : empleados) {
-		  tableModel.addRow(new Object[] {e.getDni(),e.getNombre(),e.getApellido(),e.getRol(),e.getSalaId() == 0 ? "Sin asignar" : String.valueOf(e.getSalaId())});
-	  }
-	  
-}
-
-private void styleButton(JButton button, Color bgColor) {
+  private void styleButton(JButton button, Color bgColor) {
     button.setBackground(bgColor);
     button.setForeground(Color.white);
     button.setFont(new Font("Arial", Font.BOLD, 14));
