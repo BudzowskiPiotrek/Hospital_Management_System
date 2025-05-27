@@ -117,8 +117,8 @@ public class DBConnection {
 				return false;
 			}
 			// POSTERIORMENTE SE INGRESA EN LA TABLA EMPLEADO (USUARIO_ID ES EL DNI)
-			String sqlEmpleado = "INSERT INTO Empleado (usuario_dni, contrasena) VALUES ('" + empleado.getDni() + "', '"
-					+ empleado.getContrasena() + "')";
+			String sqlEmpleado = "INSERT INTO Empleado (usuario_dni, contrasena, sala_id) VALUES ('" + empleado.getDni() + "', '"
+					+ empleado.getContrasena() + "', '" + empleado.getSalaId() + "')";
 			int filasEmpleado = stmt.executeUpdate(sqlEmpleado);
 
 			return filasEmpleado > 0;
