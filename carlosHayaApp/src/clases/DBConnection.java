@@ -224,7 +224,6 @@ public class DBConnection {
 			desconectar();
 		}
 	}
-	
 
 	public boolean asignarSala(String empleadoDni, Integer salaId) {
 		conectar();
@@ -497,6 +496,7 @@ public class DBConnection {
 	}
 
 	// ########################### CLASE ADMINISTRATIVO ###########################
+
 	public List<Turno> obtenerTodosLosTurnos() {
 		List<Turno> turnos = new ArrayList<>();
 		conectar();
@@ -545,10 +545,7 @@ public class DBConnection {
 
 	}
 
-	/*
-	 * ######################################## MEDICO
-	 * ##################################
-	 */
+	// #################################### MEDICO ################################
 
 	public boolean asignarTurno(Turno t) {
 		conectar();
@@ -577,6 +574,7 @@ public class DBConnection {
 			desconectar();
 		}
 	}
+
 	public boolean registrarReceta(Receta r) {
 		try {
 			conectar();
