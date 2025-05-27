@@ -3,98 +3,126 @@ package gestionHospital;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import clases.DBConnection;
+import clases.Medico;
+import clases.Paciente;
+
 public class PanelVerHistorialMedico extends JPanel {
 
-  private Color colorbg = Color.decode("#212f3d"); // Color de fondo para el panel
-  private JTable tablaHistorial;
-  private DefaultTableModel modelo;
-  private JTextField textFieldID;
-  private TableRowSorter<DefaultTableModel> sorter;
+    private Color colorbg = Color.decode("#212f3d"); // Color de fondo para el panel
+    private JTable tablaHistorial;
+    private DefaultTableModel modelo;
+    private JTextField textFieldID;
+    private TableRowSorter<DefaultTableModel> sorter;
+    private DBConnection db;
 
-  public PanelVerHistorialMedico() {
-    setLayout(new BorderLayout());
-    setBackground(colorbg);
-    initComponents();
-  }
-
-  private void initComponents() {
-    JLabel titulo = new JLabel("Historial Médico de Pacientes", SwingConstants.CENTER);
-    titulo.setFont(new Font("Arial", Font.BOLD, 24));
-    titulo.setForeground(Color.WHITE);
-    titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-    add(titulo, BorderLayout.NORTH);
-
-    // Panel para el filtro (ID paciente + botón)
-    JPanel filtroPanel = new JPanel();
-    filtroPanel.setBackground(colorbg);
-    filtroPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-
-    JLabel lblID = new JLabel("ID Paciente:");
-    lblID.setForeground(Color.WHITE);
-    filtroPanel.add(lblID);
-
-    textFieldID = new JTextField(10);
-    filtroPanel.add(textFieldID);
-
-    JButton btnBuscar = new JButton("Buscar");
-    btnBuscar.setBackground(Color.decode("#006D77"));
-    btnBuscar.setForeground(Color.WHITE);
-    btnBuscar.setFocusPainted(false);
-    filtroPanel.add(btnBuscar);
-
-    add(filtroPanel, BorderLayout.SOUTH);
-
-    // Columnas de la tabla para mostrar el historial médico
-    String[] columnas = { "ID", "Nombre", "Diagnóstico", "Fecha Diagnóstico", "Tratamiento", "Estado" };
-
-    // Datos de ejemplo
-    Object[][] datos = {
-        { "P001", "Juan Pérez", "Hipertensión", "15/03/2023", "Medicamentos A, B", "En tratamiento" },
-        { "P002", "María López", "Diabetes", "25/06/2024", "Insulina", "Controlado" },
-        { "P003", "Carlos Ruiz", "Fractura", "02/08/2024", "Yeso, Rehabilitación", "En recuperación" }
-    };
-
-    modelo = new DefaultTableModel(datos, columnas) {
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return false; // No editable
-      }
-    };
-
-    tablaHistorial = new JTable(modelo);
-    tablaHistorial.setFont(new Font("Arial", Font.PLAIN, 14));
-    tablaHistorial.setRowHeight(25);
-    tablaHistorial.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-
-    sorter = new TableRowSorter<>(modelo);
-    tablaHistorial.setRowSorter(sorter);
-
-    JScrollPane scrollPane = new JScrollPane(tablaHistorial);
-    scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-
-    add(scrollPane, BorderLayout.CENTER);
-
-    // Acción botón buscar
-    btnBuscar.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        filtrarTabla();
-      }
-    });
-  }
-
-  private void filtrarTabla() {
-    String idPaciente = textFieldID.getText().trim();
-    if (idPaciente.isEmpty()) {
-      // Mostrar todas las filas si el campo está vacío
-      sorter.setRowFilter(null);
-    } else {
-      // Filtrar filas que contengan exactamente el ID en la columna 0 (ID)
-      sorter.setRowFilter(RowFilter.regexFilter("^" + idPaciente + "$", 0));
+    public PanelVerHistorialMedico() {
+        setLayout(new BorderLayout());
+        setBackground(colorbg);
+        initComponents();
     }
-  }
+
+    private void initComponents() {
+        JLabel titulo = new JLabel("Historial Médico de Pacientes", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setForeground(Color.WHITE);
+        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        add(titulo, BorderLayout.NORTH);
+
+        // Panel para el filtro (ID paciente + botón)
+        JPanel filtroPanel = new JPanel();
+        filtroPanel.setBackground(colorbg);
+        filtroPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
+        JLabel lblID = new JLabel("ID Paciente:");
+        lblID.setForeground(Color.WHITE);
+        filtroPanel.add(lblID);
+
+        textFieldID = new JTextField(10);
+        filtroPanel.add(textFieldID);
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBackground(Color.decode("#006D77"));
+        btnBuscar.setForeground(Color.WHITE);
+        btnBuscar.setFocusPainted(false);
+        filtroPanel.add(btnBuscar);
+
+        add(filtroPanel, BorderLayout.SOUTH);
+
+        // Columnas de la tabla para mostrar el historial médico
+        String[] columnas = { "ID", "Nombre", "Apellido", "Contacto", "Obra social", "Medicamentos","Fecha receta","Descripción diagnostico","Fecha diagnóstico" };
+
+        //Se establece conexión la base de datos
+        db = new DBConnection();
+        
+       
+        	modelo = new DefaultTableModel(columnas,0) {
+         	   
+     			private static final long serialVersionUID = 1L;
+
+     			@Override
+                 public boolean isCellEditable(int row, int column) {
+                     return false; // No editable
+                 }
+             };
+             
+             
+        cargarDatos();
+        tablaHistorial = new JTable(modelo);
+        tablaHistorial.setFont(new Font("Arial", Font.PLAIN, 14));
+        tablaHistorial.setRowHeight(25);
+        tablaHistorial.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+
+        sorter = new TableRowSorter<>(modelo);
+        tablaHistorial.setRowSorter(sorter);
+
+        JScrollPane scrollPane = new JScrollPane(tablaHistorial);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+
+        add(scrollPane, BorderLayout.CENTER);
+        
+        
+
+        // Acción botón buscar
+        btnBuscar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                filtrarTabla();
+            }
+        });
+    }
+
+    private void cargarDatos() {
+    	  // Limpiar tabla antes de cargar
+        modelo.setRowCount(0);
+
+        ArrayList<Object[][]> resultados = db.mostrarHistorialPaciente(Sesion.getUsuarioLogueado());
+        
+        // Cada Object[][] es una fila, en tu método defines así:
+        // Object[][] datos = {{dni,nombre,apellido,...}};
+        for (Object[][] filaArray : resultados) {
+            // filaArray[0] es el array con los valores
+            modelo.addRow(filaArray[0]);
+        }
+		
+	}
+
+	private void filtrarTabla() {
+        String idPaciente = textFieldID.getText().trim();
+        if (idPaciente.isEmpty()) {
+            // Mostrar todas las filas si el campo está vacío
+            sorter.setRowFilter(null);
+        } else {
+            // Filtrar filas que contengan exactamente el ID en la columna 0 (ID)
+            sorter.setRowFilter(RowFilter.regexFilter("^" + idPaciente + "$", 0));
+        }
+    }
 }

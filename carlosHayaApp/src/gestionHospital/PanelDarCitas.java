@@ -1,13 +1,23 @@
 package gestionHospital;
 
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import clases.DBConnection;
+import clases.Turno;
+
 @SuppressWarnings("serial")
 class PanelDarCitas extends JPanel {
+	
+	private DBConnection db;
 
   // Campos del formulario declarados aquí para poder acceder a ellos
   private JTextField dniMedicoField;
@@ -85,12 +95,15 @@ class PanelDarCitas extends JPanel {
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
     buttonPanel.setBackground(Color.decode("#728C69")); // Color de fondo verde para el panel de botones
 
+    db = new DBConnection();
+    
     // Botón Guardar Cita
     JButton saveButton = new JButton("Guardar Cita");
     styleButton(saveButton, Color.decode("#006D77"));
     saveButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+    	  try {
         String dniMedico = dniMedicoField.getText();
         String dniPaciente = dniPacienteField.getText();
         String fecha = fechaField.getText();
@@ -101,18 +114,23 @@ class PanelDarCitas extends JPanel {
             || horaFin.isEmpty()) {
           JOptionPane.showMessageDialog(PanelDarCitas.this, "Por favor, complete todos los campos.", "Campos Vacíos",
               JOptionPane.WARNING_MESSAGE);
-        } else {
-          JOptionPane.showMessageDialog(PanelDarCitas.this,
-              "Cita guardada:\n" +
-                  "DNI Médico: " + dniMedico + "\n" +
-                  "DNI Paciente: " + dniPaciente + "\n" +
-                  "Fecha: " + fecha + "\n" +
-                  "Hora de Inicio: " + horaInicio + "\n" +
-                  "Hora de Fin: " + horaFin,
-              "Cita Guardada", JOptionPane.INFORMATION_MESSAGE);
+        }else if(!db.verificarRol(dniMedico).equals("medico")) {
+        	JOptionPane.showMessageDialog(PanelDarCitas.this,"El dni no es de un médico", "Error",JOptionPane.ERROR_MESSAGE);
+        } else { 
+          LocalDate fechaTransformada = transformarFecha(fecha);
+          LocalTime horaInicioTransformada = transformarHora(horaInicio);
+          LocalTime horaFinTransformada = transformarHora(horaFin);
+          
+          Turno cita = new Turno(dniMedico,dniPaciente,fechaTransformada,horaInicioTransformada,horaFinTransformada);
+          db.asignarTurno(cita);
+          JOptionPane.showMessageDialog(PanelDarCitas.this,"Se ha guardado la cita existosamente", "Cita guardada",JOptionPane.INFORMATION_MESSAGE);
           clearFields(); // Limpiar campos después de guardar
         }
+        }catch(DateTimeException r) {
+        	JOptionPane.showMessageDialog(PanelDarCitas.this,"Introduzca el formato de la fecha y de las horas correctas", "Error",JOptionPane.ERROR_MESSAGE);
+        }
       }
+      
     });
     buttonPanel.add(saveButton);
 
@@ -144,6 +162,22 @@ class PanelDarCitas extends JPanel {
     horaFinField.setText("");
   }
 
+  public LocalTime transformarHora(String horas) {
+		horas+=":00";
+		int hora = Integer.parseInt(horas.substring(0, horas.indexOf(":")));
+		int min = Integer.parseInt(horas.substring(horas.indexOf(":")+1,horas.lastIndexOf(":")));
+		int seg = Integer.parseInt(horas.substring(horas.lastIndexOf(":")+1));
+		return LocalTime.of(hora, min, seg);
+	}
+
+	public LocalDate transformarFecha(String fecha) {
+		int dia = Integer.parseInt(fecha.substring(0, fecha.indexOf("-")));
+      int mes = Integer.parseInt(fecha.substring(fecha.indexOf("-") + 1, fecha.lastIndexOf("-")));
+      int anio = Integer.parseInt(fecha.substring(fecha.lastIndexOf("-") + 1));
+		return LocalDate.of(anio, mes, dia);
+		
+	}
+  
   private void styleButton(JButton button, Color bgColor) {
     button.setBackground(bgColor);
     button.setForeground(Color.white);

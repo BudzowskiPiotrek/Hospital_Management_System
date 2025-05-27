@@ -1,31 +1,46 @@
 package gestionHospital;
 
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-public class PanelVerCitasMedicas extends JPanel {
-  public PanelVerCitasMedicas() {
-    setLayout(new BorderLayout());
-    setBackground(Color.WHITE);
+import clases.DBConnection;
+import clases.Turno;
 
-    // Título
-    JLabel titulo = new JLabel("Listado de Citas Médicas", SwingConstants.CENTER);
-    titulo.setFont(new Font("Arial", Font.BOLD, 24));
-    titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-    add(titulo, BorderLayout.NORTH);
+import java.awt.*;
+import java.util.ArrayList;
 
-    // Datos de ejemplo
-    String[] columnas = { "DNI Paciente", "Día", "Hora Comienzo", "Hora Final" };
-    Object[][] datos = {
-        { "12345678A", "2025-06-01", "10:00", "10:30" },
-        { "98765432B", "2025-06-01", "11:00", "11:45" },
-        { "55555555C", "2025-06-02", "09:00", "09:30" }
-    };
+	public class PanelVerCitasMedicas extends JPanel {
+		private DBConnection db;
+		
+	    public PanelVerCitasMedicas() {
+	    	db = new DBConnection();
+	    	
+	        setLayout(new BorderLayout());
+	        setBackground(Color.WHITE);
 
-    JTable tabla = new JTable(new DefaultTableModel(datos, columnas));
-    JScrollPane scrollPane = new JScrollPane(tabla);
+	        // Título
+	        JLabel titulo = new JLabel("Listado de Citas Médicas", SwingConstants.CENTER);
+	        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+	        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+	        add(titulo, BorderLayout.NORTH);
 
-    add(scrollPane, BorderLayout.CENTER);
-  }
-}
+	        // Datos de ejemplo
+	        String[] columnas = { "DNI Paciente", "Día", "Hora Comienzo", "Hora Final" };
+	        
+	        DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
+	        JTable tabla = new JTable(modelo);
+	        JScrollPane scrollPane = new JScrollPane(tabla);
+	        cargarDatosCitas(modelo);
+	        
+	        add(scrollPane, BorderLayout.CENTER);
+	    }
+
+		private void cargarDatosCitas(DefaultTableModel modelo) {
+			modelo.setRowCount(0);
+			ArrayList<Turno> citas = (ArrayList<Turno>) db.obtenerCitasMedicos(Sesion.getUsuarioLogueado());
+			for(Turno t : citas) {
+				modelo.addRow(new Object[] {t.getPacienteDni(),t.getDia(),t.getHoraInicio(),t.getHoraFin()});
+			}
+			
+		}
+	}
