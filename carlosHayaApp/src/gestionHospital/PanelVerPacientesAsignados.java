@@ -5,76 +5,96 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import clases.DBConnection;
 
-public class PanelVerPacientesAsignados extends JPanel {  // Cambiado de Component a JPanel
+public class PanelVerPacientesAsignados extends JPanel {
 
-	private static final long serialVersionUID = 1L;
-	private Color colorbg = Color.decode("#212f3d");
+    private static final long serialVersionUID = 1L;
+    
+    private final Color primaryBackgroundColor = Color.decode("#212f3d");
+    private final Color titlePanelColor = Color.RED;
+    private final Color titleTextColor = Color.WHITE;
+    private final Color headerBackgroundColor = Color.decode("#2C3E50");
+    private final Color headerTextColor = Color.WHITE;
+
     private JTable tablaPacientes;
     private DBConnection db;
-    private  DefaultTableModel modelo;
+    private DefaultTableModel modelo;
     
     public PanelVerPacientesAsignados() {
-        setBackground(colorbg);
-        setPreferredSize(new Dimension(800, 600));  // Asegúrate de darle un tamaño adecuado
-        initComponents();
+        setLayout(new BorderLayout(10, 10));
+        setBackground(primaryBackgroundColor);
+        setPreferredSize(new Dimension(800, 600)); 
         
+        db = new DBConnection(); 
+
+        initComponents();
     }
 
     private void initComponents() {
-        // Crear el título
-        JLabel titulo = new JLabel("Pacientes Asignados", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 24));
-        titulo.setForeground(Color.WHITE);
-        titulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(titulo, BorderLayout.NORTH);  // Usa add() directamente de JPanel
+        JPanel titleContainerPanel = new JPanel();
+        titleContainerPanel.setBackground(titlePanelColor);
+        titleContainerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
+        titleContainerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        // Columnas de la tabla
+        JLabel titulo = new JLabel("Pacientes Asignados", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 28));
+        titulo.setForeground(titleTextColor);
+        titleContainerPanel.add(titulo);
+        add(titleContainerPanel, BorderLayout.NORTH);
+
         String[] columnas = { "ID", "Nombre", "Apellido", "Contacto","Obra social", "Sala" };
         
-        //Conexión con base de datos
-        db=new DBConnection();
-
         modelo = new DefaultTableModel( columnas, 0) {
-			private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-			// Evitar que las celdas sean editables
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        //Se carga la lista pacientes asignados
+        
         cargaDatos();
 
         tablaPacientes = new JTable(modelo);
         tablaPacientes.setFont(new Font("Arial", Font.PLAIN, 14));
         tablaPacientes.setRowHeight(25);
+        
+        DefaultTableCellRenderer customHeaderRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                label.setBackground(headerBackgroundColor);
+                label.setForeground(headerTextColor);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setOpaque(true);
+                
+                return label;
+            }
+        };
+
+        for (int i = 0; i < tablaPacientes.getColumnModel().getColumnCount(); i++) {
+            tablaPacientes.getColumnModel().getColumn(i).setHeaderRenderer(customHeaderRenderer);
+        }
+        
         tablaPacientes.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
 
-        // Crear un JScrollPane para la tabla
         JScrollPane scrollPane = new JScrollPane(tablaPacientes);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
-        // Añadir el JScrollPane al centro del panel
-        add(scrollPane, BorderLayout.CENTER);  // Usa add() directamente de JPanel
+        add(scrollPane, BorderLayout.CENTER);
     }
 
-	private void cargaDatos() {
-		
-		  // Limpiar tabla antes de cargar
+    private void cargaDatos() {
         modelo.setRowCount(0);
 
         ArrayList<Object[][]> resultados = db.pacientesAsignados(Sesion.getUsuarioLogueado());
 
-        // Cada Object[][] es una fila, en el método pacienteAsignados se define así:
-        // Object[][] datos = {{dni,nombre,apellido,...}};
         for (Object[][] filaArray : resultados) {
-            // filaArray[0] es el array con los valores
             modelo.addRow(filaArray[0]);
         }
-		
-	}
+    }
 }

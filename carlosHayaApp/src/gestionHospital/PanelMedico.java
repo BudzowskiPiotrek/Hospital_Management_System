@@ -27,7 +27,7 @@ public class PanelMedico extends JPanel {
   public PanelMedico(PanelImagen panelImagen) {
     this.panelImagen = panelImagen;
     this.setBackground(colorbg);
-    this.setPreferredSize(new Dimension(900, 600));
+    this.setPreferredSize(new Dimension(1000, 600));
     this.setLayout(new BorderLayout());
     this.setBorder(new EmptyBorder(20, 20, 20, 20));
 
