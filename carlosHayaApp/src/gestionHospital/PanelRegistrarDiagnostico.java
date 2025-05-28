@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -163,9 +164,12 @@ public class PanelRegistrarDiagnostico extends JPanel {
                         textFieldPaciente.setText("");
                         textFieldFecha.setText("");
                         textAreaDescripcion.setText("");
+                      //Recarga la tabla de PanelVerHistorialMedico
+                        recargarTablaHistorial();
                     } else {
                         JOptionPane.showMessageDialog(null, "Error al guardar el diagnóstico en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
+                    
                 } catch(NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Error en el formato numérico de la fecha. Asegúrese de que sea DD-MM-YYYY.", "Error", JOptionPane.ERROR_MESSAGE);
                 } catch(DateTimeException e) {
@@ -185,5 +189,17 @@ public class PanelRegistrarDiagnostico extends JPanel {
         formularioPanel.add(btnGuardar, gbc);
         
         add(formularioPanel, BorderLayout.CENTER);
+    }
+    
+    public void recargarTablaHistorial() {
+
+		Sesion.getModelo().setRowCount(0);
+		ArrayList<Object[][]> resultados = db.mostrarHistorialPaciente(Sesion.getUsuarioLogueado());
+	        
+	    for (Object[][] filaArray : resultados) {
+	    	Sesion.getModelo().addRow(filaArray[0]);
+	    }
+
+    
     }
 }

@@ -25,7 +25,7 @@ public class PanelVerHistorialMedico extends JPanel {
     private DefaultTableModel modelo;
     private JTextField textFieldID;
     private TableRowSorter<DefaultTableModel> sorter;
-    private DBConnection db;
+    private static DBConnection db;
 
     public PanelVerHistorialMedico() {
         db = new DBConnection(); 
@@ -34,6 +34,8 @@ public class PanelVerHistorialMedico extends JPanel {
         setBackground(primaryBackgroundColor);
         setPreferredSize(new Dimension(1000, 700));
         initComponents();
+        
+        
     }
 
     private void initComponents() {
@@ -87,7 +89,12 @@ public class PanelVerHistorialMedico extends JPanel {
             }
         };
         
+        
+        
+        //Carga la tabla de datos
         cargarDatos();
+        
+        Sesion.setModelo(modelo);
         
         tablaHistorial = new JTable(modelo);
         tablaHistorial.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -127,16 +134,17 @@ public class PanelVerHistorialMedico extends JPanel {
                 filtrarTabla();
             }
         });
+        
     }
 
     private void cargarDatos() {
-        modelo.setRowCount(0);
+		modelo.setRowCount(0);
+		ArrayList<Object[][]> resultados = db.mostrarHistorialPaciente(Sesion.getUsuarioLogueado());
+	        
+	    for (Object[][] filaArray : resultados) {
+	            modelo.addRow(filaArray[0]);
+	    }
 
-        ArrayList<Object[][]> resultados = db.mostrarHistorialPaciente(Sesion.getUsuarioLogueado());
-        
-        for (Object[][] filaArray : resultados) {
-            modelo.addRow(filaArray[0]);
-        }
     }
 
     private void filtrarTabla() {

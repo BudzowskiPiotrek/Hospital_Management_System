@@ -3,6 +3,7 @@ package gestionHospital;
 import java.awt.*;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -172,6 +173,8 @@ public class PanelRecetarMedicacion extends JPanel {
                     textFieldPaciente.setText("");
                     textFieldMedicamento.setText("");
                     textFieldFecha.setText("");
+                  //Recarga la tabla de PanelVerHistorialMedico
+                    recargarTablaHistorial();
                 }else {
                     JOptionPane.showMessageDialog(this, "Error al guardar la receta en la base de datos.", "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -185,5 +188,17 @@ public class PanelRecetarMedicacion extends JPanel {
             JOptionPane.showMessageDialog(this, "Ocurrió un error inesperado al guardar la receta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+    }
+
+	public void recargarTablaHistorial() {
+
+		Sesion.getModelo().setRowCount(0);
+		ArrayList<Object[][]> resultados = db.mostrarHistorialPaciente(Sesion.getUsuarioLogueado());
+	        
+	    for (Object[][] filaArray : resultados) {
+	    	Sesion.getModelo().addRow(filaArray[0]);
+	    }
+
+    
     }
 }
