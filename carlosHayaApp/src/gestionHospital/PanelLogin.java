@@ -114,26 +114,26 @@ public class PanelLogin extends JPanel {
 				JOptionPane.showMessageDialog(null, "Usuario no encontrado o error en la conexión.");
 			} else {
 				switch (rol) {
-					case "administrador":
-						panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
-						break;
-					case "administrativo":
-						panelImagen.cambiarPanel(new PanelAdministrativo(panelImagen));
+				case "administrador":
+					panelImagen.cambiarPanel(new PanelAdmin(panelImagen));
+					break;
+				case "administrativo":
+					panelImagen.cambiarPanel(new PanelAdministrativo(panelImagen));
 
-						break;
-					case "medico":
-						panelImagen.cambiarPanel(new PanelMedico(panelImagen));
-						break;
-					case "enfermero":
+					break;
+				case "medico":
+					panelImagen.cambiarPanel(new PanelMedico(panelImagen));
+					break;
+				case "enfermero":
+					panelImagen.cambiarPanel(new PanelEnfermero(panelImagen));
+					break;
+				case "mantenimiento":
+					panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
+					break;
 
-						break;
-					case "mantenimiento":
-						panelImagen.cambiarPanel(new PanelMantenimiento(panelImagen));
-						break;
-
-					default:
-						JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rol);
-						break;
+				default:
+					JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rol);
+					break;
 				}
 			}
 		});

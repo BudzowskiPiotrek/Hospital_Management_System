@@ -55,7 +55,7 @@ public class PanelRegistrar extends JPanel {
         JLabel rolLabel = new JLabel("Rol:");
         rolLabel.setFont(labelFont);
         rolLabel.setForeground(labelColor);
-        String[] roles = { "administrador", "administrativo", "medico", "mantedimiento" };
+        String[] roles = { "administrador", "administrativo", "medico", "mantedimiento" ,"enfermero"};
         JComboBox<String> rolComboBox = new JComboBox<>(roles);
         rolComboBox.setPreferredSize(new Dimension(184, 25));
         rolComboBox.setFocusable(false);

@@ -14,8 +14,7 @@ import java.awt.event.ActionListener;
 @SuppressWarnings("serial")
 class PanelDarAlta extends JPanel {
 
-    // --- Colores Consistentes ---
-    // Colores base para la aplicación (pueden ser definidos en un lugar centralizado)
+    
     private final Color accentColor = Color.decode("#006D77"); // Color de acento para botones, etc.
     private final Color headerTextColor = Color.WHITE; // Color de texto para cabeceras y títulos
     private final Color borderColor = Color.LIGHT_GRAY; // Color para bordes de tablas
@@ -30,8 +29,7 @@ class PanelDarAlta extends JPanel {
 
     public PanelDarAlta() {
         setLayout(new BorderLayout(0, 0)); // Sin espaciado entre componentes principales
-        // setBorder(new EmptyBorder(20, 20, 20, 20)); // Ya no necesitamos un borde en el panel principal si los subpaneles se pegan
-
+       
         // --- 1. Panel para el título (NORTE) ---
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         titlePanel.setBackground(titleBackgroundColor); // Fondo rojo
@@ -60,10 +58,7 @@ class PanelDarAlta extends JPanel {
         add(scrollPacientes, BorderLayout.CENTER);
 
         // --- 3. Panel para el botón "Dar de Alta" (SUR) ---
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)); // Centra el botón
-        // No le damos un color de fondo aquí si el mainPanel es de un color oscuro y queremos que se integre
-        // Si el mainPanel tiene un color de fondo claro, este panel debería tenerlo también.
-        // Asumiendo que el panel que contiene PanelDarAlta tendrá un fondo adecuado.
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)); 
         buttonPanel.setBorder(new EmptyBorder(10, 0, 10, 0)); // Padding vertical
 
         btnDarAlta = new JButton("Dar de Alta");
@@ -89,15 +84,11 @@ class PanelDarAlta extends JPanel {
                     String nombre = (String) modeloPacientes.getValueAt(selectedRow, 1);
                     String apellidos = (String) modeloPacientes.getValueAt(selectedRow, 2);
 
-                    // Lógica para dar de alta (simulada)
                     darAltaPaciente(dni, nombre, apellidos);
                     
-                    // Opcional: Eliminar el paciente de la tabla después de dar de alta
-                    // modeloPacientes.removeRow(selectedRow); 
+                   
                     
-                    // Recargar los pacientes si es necesario actualizar la lista tras el alta
-                    loadPacientes(); // Esto recargará la lista (ej: si se da de alta, no debería aparecer más)
-                }
+                   loadPacientes();  }
             }
         });
 
