@@ -481,8 +481,8 @@ public class DBConnection {
 			conectar();
 			Statement stmt = conn.createStatement();
 
-			String sql = "INSERT INTO TurnoMantenimiento (empleado_dni, sala_id, fecha) VALUES ('" + empleadoDni + "', "
-					+ salaId + ", '" + fecha.toString() + "')";
+			String sql = "INSERT INTO TurnoMantenimiento (empleado_dni, sala_id, fecha, limpia) VALUES ('" + empleadoDni
+					+ "', " + salaId + ", '" + fecha.toString() + "', " + 0 + ")";
 			int filas = stmt.executeUpdate(sql);
 
 			return filas > 0;
@@ -713,6 +713,59 @@ public class DBConnection {
 		}
 
 		return turnos;
+	}
+
+	// #################################### MANTENIMIENTO
+	// ################################
+
+	public List<TurnoMantenimientoInfo> obtenerTurnosMantenimientoPorDNI(String empleadoDni) {
+		List<TurnoMantenimientoInfo> turnosMantenimiento = new ArrayList<>();
+		Statement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			conectar();
+			String sql = "SELECT tm.sala_id, s.tipo, tm.limpia, tm.fecha " + "FROM TurnoMantenimiento tm "
+					+ "JOIN Sala s ON tm.sala_id = s.id " + "WHERE tm.empleado_dni = '" + empleadoDni + "'";
+
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				int salaId = rs.getInt("sala_id");
+				String tipoSala = rs.getString("tipo");
+				boolean limpia = rs.getBoolean("limpia");
+				Date fechaMantenimiento = rs.getDate("fecha");
+
+				TurnoMantenimientoInfo info = new TurnoMantenimientoInfo(salaId, tipoSala, limpia, fechaMantenimiento);
+				turnosMantenimiento.add(info);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			desconectar();
+		}
+		return turnosMantenimiento;
+	}
+
+	public boolean actualizarEstadoLimpiezaSala(int salaId, boolean estadoLimpia) {
+		Statement stmt = null;
+		try {
+			conectar();
+			stmt = conn.createStatement();
+			
+			String sql = "UPDATE TurnoMantenimiento SET limpia = " + (estadoLimpia ? 1 : 0) + " WHERE sala_id = "
+					+ salaId;
+			
+			int filasAfectadas = stmt.executeUpdate(sql);
+			return filasAfectadas > 0;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			desconectar();
+		}
 	}
 
 }
