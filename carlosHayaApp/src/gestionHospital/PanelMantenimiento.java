@@ -66,31 +66,37 @@ public class PanelMantenimiento extends JPanel {
 		infoPanel = new JPanel(cardLayout);
 		infoPanel.setBackground(displayPanelBg); // Light gray background #ECF0F1
 
+		// Initialize the specific Maintenance sub-panels
+		// Now instantiate PanelMantenimientoLista
 		panelMantenimiento = new PanelMantenimientoLista(displayPanelBg, subPanelTitleBgColor);
-		panelTerminarLimpieza = createPanelTerminarLimpieza(); 
+		panelTerminarLimpieza = createPanelTerminarLimpieza(); // Re-added
 
+		// Add the panels to the CardLayout with their new names
 		infoPanel.add(panelMantenimiento, "Mantenimiento");
-		infoPanel.add(panelTerminarLimpieza, "Terminar limpieza"); 
+		infoPanel.add(panelTerminarLimpieza, "Terminar limpieza"); // Re-added
 
+		// Updated button labels - now three buttons again
 		String[] buttonLabels = { "Mantenimiento", "Terminar limpieza", "Cerrar Sesión" };
 
 		for (String buttonLabel : buttonLabels) {
 			JButton button = new JButton(buttonLabel);
 			// Apply common styles
 			stylePanelButton(button);
-			button.setForeground(Color.white);
+			button.setForeground(Color.white); // Default text color for all buttons
 
 			if (buttonLabel.equals("Cerrar Sesión")) {
-				button.setBackground(Color.decode("#C08080")); 
+				button.setBackground(Color.decode("#C08080")); // Original color of the Logout button
 				button.addActionListener(e -> {
-					button.setBackground(Color.decode("#FF6347")); 
+					button.setBackground(Color.decode("#FF6347")); // Color when pressed
 					panelImagen.cambiarPanel(new PanelLogin(panelImagen));
 				});
 			} else if (buttonLabel.equals("Mantenimiento")) {
+				// The "Mantenimiento" button is disabled as it's the default view
 				button.setEnabled(false);
-				button.setBackground(colorButton); 
+				button.setBackground(colorButton); // Default color for disabled button
 			} else if (buttonLabel.equals("Terminar limpieza")) {
-				button.setBackground(Color.decode("#4CAF50"));
+				button.setBackground(Color.decode("#4CAF50")); // Green color for "Terminar limpieza"
+				// Add action listener to call markSelectedRoomClean()
 				button.addActionListener(e -> {
 					panelMantenimiento.marcasLimpiezaSala();
 				});
@@ -98,20 +104,24 @@ public class PanelMantenimiento extends JPanel {
 			optionPanel.add(button);
 		}
 
+		// Assemble the contentPanel
 		contentPanel.add(optionPanel, BorderLayout.WEST);
 		contentPanel.add(infoPanel, BorderLayout.CENTER);
 
+		// Assemble the mainWrapperPanel
 		mainWrapperPanel.add(titlePanel, BorderLayout.NORTH);
+		mainWrapperPanel.add(contentPanel, BorderLayout.CENTER);
 
+		// Add the mainWrapperPanel to PanelMantenimiento
 		this.add(mainWrapperPanel, BorderLayout.CENTER);
 
+		// Show the "Mantenimiento" panel by default
 		cardLayout.show(infoPanel, "Mantenimiento");
 
 		revalidate();
 		repaint();
 	}
 
-	
 	private JPanel createPanelTerminarLimpieza() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(displayPanelBg); 
@@ -120,15 +130,13 @@ public class PanelMantenimiento extends JPanel {
 		JPanel titleWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		titleWrapper.setBackground(subPanelTitleBgColor); 
 		titleWrapper.setBorder(new EmptyBorder(15, 0, 15, 0)); 
-
 		JLabel titulo = new JLabel("Terminar Limpieza", SwingConstants.CENTER); 
 		titulo.setFont(new Font("Arial", Font.BOLD, 22));
-		titulo.setForeground(Color.WHITE);
+		titulo.setForeground(Color.WHITE); 
 		titleWrapper.add(titulo);
 
 		panel.add(titleWrapper, BorderLayout.NORTH); 
 
-		
 		return panel;
 	}
 
