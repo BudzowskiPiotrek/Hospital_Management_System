@@ -6,6 +6,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+
+import clases.DBConnection;
+import clases.Paciente;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -14,6 +18,8 @@ import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 class PanelAsignarCama extends JPanel {
+	private DBConnection db;
+	
     // Colores consistentes con el resto de la aplicación
     private final Color primaryBackgroundColor = Color.decode("#ECF0F1"); 
     private final Color accentColor = Color.decode("#006D77"); 
@@ -45,6 +51,7 @@ class PanelAsignarCama extends JPanel {
     private JLabel titleCamasLabel;
 
     public PanelAsignarCama() {
+    	db = new DBConnection();
         setLayout(new BorderLayout());
         setBackground(primaryBackgroundColor); 
         setBorder(new EmptyBorder(0, 0, 0, 0)); 
@@ -234,7 +241,7 @@ class PanelAsignarCama extends JPanel {
         btnConfirmarAsignacion.addActionListener(e -> {
             int selectedRow = tablaCamas.convertRowIndexToModel(tablaCamas.getSelectedRow());
             if (selectedRow != -1) {
-                String idCama = (String) modeloCamas.getValueAt(selectedRow, 0);
+                String idCama = modeloCamas.getValueAt(selectedRow, 0).toString();
                 assignBedToPatient(pacienteSeleccionadoDNI, idCama);
                 cardLayout.show(mainPanel, "PatientList");
                 loadAllPatients(); 
@@ -262,11 +269,15 @@ class PanelAsignarCama extends JPanel {
     // --- Métodos de Carga y Lógica (SIMULADA - NO BACKEND) ---
     private void loadAllPatients() {
         modeloPacientes.setRowCount(0);
-        modeloPacientes.addRow(new Object[]{"12345678A", "Juan", "Pérez", "Sala 101"});
-        modeloPacientes.addRow(new Object[]{"23456789B", "María", "Gómez", "Libre"});
-        modeloPacientes.addRow(new Object[]{"34567890C", "Pedro", "López", "Sala 203"});
-        modeloPacientes.addRow(new Object[]{"45678901D", "Ana", "Martínez", "Libre"});
-        modeloPacientes.addRow(new Object[]{"56789012E", "Luis", "Ruiz", "Sala 102"});
+        ArrayList<Paciente> pacientes = (ArrayList<Paciente>) db.mostrarPacientesSinCama();
+        for(Paciente p : pacientes) {
+        	if(p.getSalaID()==0) {
+        		modeloPacientes.addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),"sin habiación asignada"});
+        	}else {
+        		modeloPacientes.addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),p.getSalaID()});
+        	}
+        }
+        
         adjustColumnWidths(tablaPacientes);
     }
 
@@ -276,43 +287,55 @@ class PanelAsignarCama extends JPanel {
             loadAllPatients();
             return;
         }
-
-        ArrayList<Object[]> allPatients = new ArrayList<>();
-        allPatients.add(new Object[]{"12345678A", "Juan", "Pérez", "Sala 101"});
-        allPatients.add(new Object[]{"23456789B", "María", "Gómez", "Libre"});
-        allPatients.add(new Object[]{"34567890C", "Pedro", "López", "Sala 203"});
-        allPatients.add(new Object[]{"45678901D", "Ana", "Martínez", "Libre"});
-        allPatients.add(new Object[]{"56789012E", "Luis", "Ruiz", "Sala 102"});
-
-        for (Object[] patient : allPatients) {
-            String dni = (String) patient[0];
-            String nombre = (String) patient[1];
-            String apellido = (String) patient[2];
+        ArrayList<Paciente> pacientes = (ArrayList<Paciente>) db.mostrarPacientesSinCama();
+        for(Paciente p : pacientes) {
+            String dni = p.getDni();
+            String nombre = p.getNombre();
+            String apellido = p.getApellido();
+            int sala = p.getSalaID();
+            
             if (dni.toLowerCase().contains(query.toLowerCase()) ||
                 nombre.toLowerCase().contains(query.toLowerCase()) ||
                 apellido.toLowerCase().contains(query.toLowerCase())) {
-                modeloPacientes.addRow(patient);
+            	if(sala==0) {
+            		modeloPacientes.addRow(new Object[] {dni,nombre,apellido,"sin habitación asignada"});
+            	}else {
+            		modeloPacientes.addRow(new Object[] {dni,nombre,apellido,sala});
+            	}
             }
         }
+
         adjustColumnWidths(tablaPacientes);
     }
 
     private void loadAvailableBeds() {
         modeloCamas.setRowCount(0);
-        modeloCamas.addRow(new Object[]{"Cama 104", "Individual", "Disponible"});
-        modeloCamas.addRow(new Object[]{"Cama 105", "Doble", "Disponible"});
-        modeloCamas.addRow(new Object[]{"Cama 201", "Individual", "Disponible"});
-        modeloCamas.addRow(new Object[]{"Cama 202", "Individual", "Disponible"});
+        ArrayList<Integer> camas = (ArrayList<Integer>) db.mostrarCama();
+        for(Integer c : camas) {
+        	modeloCamas.addRow(new Object[]{c, "Habitación", "Disponible"});
+        }
         adjustColumnWidths(tablaCamas);
     }
 
     private void assignBedToPatient(String patientDNI, String bedID) {
-        JOptionPane.showMessageDialog(
-            this,
-            "Cama " + bedID + " asignada al paciente con DNI: " + patientDNI + ".",
-            "Asignación Exitosa",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+    	int id_sala = Integer.parseInt(bedID);
+    	if(db.asignarSalaPaciente(patientDNI, id_sala)) {
+    		JOptionPane.showMessageDialog(
+    	            this,
+    	            "Cama " + bedID + " asignada al paciente con DNI: " + patientDNI + ".",
+    	            "Asignación Exitosa",
+    	            JOptionPane.INFORMATION_MESSAGE
+    	        );
+    		if(db.actualizarDisponibilidad1(bedID)) {
+    			System.out.println("Disponibilidad actualizada");
+    		}
+    		//Recarga la información de la tabla en PanelDarAlta
+    		recargarTablaDarAlta();
+    		
+    	}else {
+    		JOptionPane.showMessageDialog(this, "Ha habido un error al asignar la cama al paciente","Error",JOptionPane.ERROR_MESSAGE);
+    	}
+        
     }
 
     // --- Métodos de Estilo ---
@@ -358,5 +381,21 @@ class PanelAsignarCama extends JPanel {
 
             table.getColumnModel().getColumn(column).setPreferredWidth(maxWidth + 10);
         }
+    }
+    public void recargarTablaDarAlta() {
+
+		Sesion.getModelo().setRowCount(0);
+		ArrayList<Paciente> pacientes = (ArrayList<Paciente>) db.mostrarPacientesDeBaja();
+	        
+		for(Paciente p : pacientes) {
+        	if(p.getSalaID()==0) {
+        		Sesion.getModelo().addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),"sin habitación asignada"});
+        	}else {
+        		Sesion.getModelo().addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),p.getSalaID()});
+        	}
+        	
+        }
+
+    
     }
 }

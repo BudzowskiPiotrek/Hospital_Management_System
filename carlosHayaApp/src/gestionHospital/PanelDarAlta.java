@@ -6,14 +6,19 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+
+import clases.DBConnection;
+import clases.Paciente;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 
 @SuppressWarnings("serial")
 class PanelDarAlta extends JPanel {
-
+	private DBConnection db;
     
     private final Color accentColor = Color.decode("#006D77"); // Color de acento para botones, etc.
     private final Color headerTextColor = Color.WHITE; // Color de texto para cabeceras y títulos
@@ -28,6 +33,8 @@ class PanelDarAlta extends JPanel {
     private JButton btnDarAlta;
 
     public PanelDarAlta() {
+    	db= new DBConnection();
+    	
         setLayout(new BorderLayout(0, 0)); // Sin espaciado entre componentes principales
        
         // --- 1. Panel para el título (NORTE) ---
@@ -50,6 +57,8 @@ class PanelDarAlta extends JPanel {
                 return false; // Las celdas de la tabla no son editables
             }
         };
+        Sesion.setModelo(modeloPacientes);
+        
         tablaPacientes = new JTable(modeloPacientes);
         styleTable(tablaPacientes, modeloPacientes); // Aplica estilos a la tabla y su cabecera
         
@@ -100,23 +109,42 @@ class PanelDarAlta extends JPanel {
 
     private void loadPacientes() {
         modeloPacientes.setRowCount(0); // Limpia la tabla
-        // Añade algunos pacientes de ejemplo
-        modeloPacientes.addRow(new Object[]{"12345678A", "Juan", "Pérez García", "101"});
-        modeloPacientes.addRow(new Object[]{"87654321B", "María", "López Fernández", "203"});
-        modeloPacientes.addRow(new Object[]{"11223344C", "Pedro", "Ruiz Martín", "UCI"});
-        modeloPacientes.addRow(new Object[]{"99887766D", "Ana", "Gómez Sánchez", "305"});
+        
+        ArrayList<Paciente> pacientes = (ArrayList<Paciente>) db.mostrarPacientesDeBaja();
+        for(Paciente p : pacientes) {
+        	if(p.getSalaID()==0) {
+        		modeloPacientes.addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),"sin habitación asignada"});
+        	}else {
+        		modeloPacientes.addRow(new Object[] {p.getDni(),p.getNombre(),p.getApellido(),p.getSalaID()});
+        	}
+        	
+        }
         adjustColumnWidths(tablaPacientes); // Ajusta el ancho de las columnas
     }
 
     private void darAltaPaciente(String dni, String nombre, String apellidos) {
-        // Aquí iría la lógica real para interactuar con la base de datos
-        // o el sistema de gestión del hospital para dar de alta al paciente.
-        JOptionPane.showMessageDialog(
-            this,
-            "El paciente " + nombre + " " + apellidos + " con DNI " + dni + " ha sido dado de alta correctamente.",
-            "Paciente Dado de Alta",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+    	if(db.darAlta(dni)) {
+    		JOptionPane.showMessageDialog(
+    	            this,
+    	            "El paciente " + nombre + " " + apellidos + " con DNI " + dni + " ha sido dado de alta correctamente.",
+    	            "Paciente Dado de Alta",
+    	            JOptionPane.INFORMATION_MESSAGE
+    	        );
+    		if(db.actualizarDisponibilidad2(dni)) {
+    			System.out.println("Disponibilidad actualizada");
+    		}
+    		if(db.actualizarPacienteSala(dni)) {
+    			System.out.println("Sala de persona actualizada");
+    		}
+    	}else {
+    		JOptionPane.showMessageDialog(
+    	            this,
+    	            "Error al dar de alta al paciente",
+    	            "ERROR",
+    	            JOptionPane.ERROR_MESSAGE
+    	        );
+    	}
+        
     }
 
     // --- Métodos de Estilo Reutilizados ---

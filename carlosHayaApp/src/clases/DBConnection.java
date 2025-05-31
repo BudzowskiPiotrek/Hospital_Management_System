@@ -767,5 +767,173 @@ public class DBConnection {
 			desconectar();
 		}
 	}
+	
+	//################################################ METODOS DE ENFERMERO ################################################################//
+	public List<Integer> mostrarCama() {
+		List<Integer> salas = new ArrayList<>();
+		int id = 0;
+		conectar();
+		
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "SELECT id FROM sala WHERE disponibilidad=1 AND tipo = 'Habitacion' ";
+			ResultSet rs = stat.executeQuery(sql);
+			while(rs.next()) {
+				id = rs.getInt("id");
+				salas.add(id);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		return salas;
+	}
+	
+	public List<Paciente> mostrarPacientesSinCama() {
+		List<Paciente> paciente = new ArrayList<>();
+		String id = "";
+		String nombre="";
+		String apellido="";
+		conectar();
+		
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "SELECT u.dni, u.nombre, u.apellido FROM usuario u INNER JOIN paciente p ON u.dni = p.usuario_dni WHERE p.alta=0 AND p.sala_id=0;";
+			ResultSet rs = stat.executeQuery(sql);
+			while(rs.next()) {
+				id = rs.getString("u.dni");
+				nombre = rs.getString("u.nombre");
+				apellido = rs.getString("u.apellido");
+				Paciente p = new Paciente(nombre,apellido,id,null,null,null,false,0);
+				paciente.add(p);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		return paciente;
+	}
+	
+	public List<Paciente> mostrarPacientesDeBaja() {
+		List<Paciente> paciente = new ArrayList<>();
+		String id = "";
+		String nombre="";
+		String apellido="";
+		int cama= 0;
+		conectar();
+		
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "SELECT u.dni, u.nombre, u.apellido, p.sala_id FROM usuario u INNER JOIN paciente p ON u.dni = p.usuario_dni WHERE p.alta=0 AND p.sala_id!=0;";
+			ResultSet rs = stat.executeQuery(sql);
+			while(rs.next()) {
+				id = rs.getString("u.dni");
+				nombre = rs.getString("u.nombre");
+				apellido = rs.getString("u.apellido");
+				cama = rs.getInt("p.sala_id");
+				Paciente p = new Paciente(nombre,apellido,id,null,null,null,false,cama);
+				paciente.add(p);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		return paciente;
+	}
+	
+	public boolean actualizarDisponibilidad1(String id_sala) {
+		conectar();
+		int resultado = 0;
+		try {
+			
+			Statement stat = conn.createStatement();
+			String sql = "UPDATE sala SET disponibilidad=0 WHERE id="+id_sala+";";
+			resultado = stat.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		if(resultado>0) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+	
+	public boolean darAlta(String dni) {
+		conectar();
+		int resultado = 0;
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "UPDATE paciente SET alta=1 WHERE usuario_dni='"+dni+"';";
+			resultado = stat.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		if(resultado>0) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+	public boolean actualizarPacienteSala(String dni) {
+		conectar();
+		int resultado = 0;
+		try {
+			Statement stat = conn.createStatement();
+			String sql = "UPDATE paciente SET sala_id=0 WHERE usuario_dni='"+dni+"';";
+			resultado = stat.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		if(resultado>0) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+	
+	public boolean actualizarDisponibilidad2(String dni) {
+		conectar();
+		int resultado = 0;
+		String id_sala = "";
+		try {
+			
+			Statement stat = conn.createStatement();
+			String sql1 = "SELECT sala_id FROM paciente WHERE usuario_dni='"+dni+"';";
+			ResultSet rs = stat.executeQuery(sql1);
+			if(rs.next()) {
+				id_sala = rs.getString("sala_id");
+			}
+			String sql = "UPDATE sala SET disponibilidad=1 WHERE id="+id_sala+";";
+			resultado = stat.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			desconectar();
+		}
+		if(resultado>0) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+	
 
 }
