@@ -20,7 +20,7 @@ public class PanelEnfermero extends JPanel {
     // Declaración de los paneles internos específicos del enfermero
     private PanelAsignarCama panelAsignarCama;
     private PanelDarAlta panelDarAlta;
-    private PanelVerPacientesEnfermero verPacientesAsignadosEnfermero; // Nombre más claro para la clase
+   
 
     public PanelEnfermero(PanelImagen panelImagen) {
         this.panelImagen = panelImagen;
@@ -53,7 +53,7 @@ public class PanelEnfermero extends JPanel {
         contentPanel.setBorder(new EmptyBorder(0, 10, 10, 10)); // Padding para el contenido
 
         // Panel de opciones (menú lateral izquierdo)
-        JPanel optionPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // 4 filas (para 4 botones), 1 columna, espaciado de 10px
+        JPanel optionPanel = new JPanel(new GridLayout(3, 1, 10, 10)); // 4 filas (para 4 botones), 1 columna, espaciado de 10px
         optionPanel.setBackground(colorbg); // Fondo oscuro #212f3d
         optionPanel.setPreferredSize(new Dimension(230, 550)); // Ancho preferido para los botones
         optionPanel.setBorder(new EmptyBorder(0, 20, 0, 0)); // 20px de padding a la izquierda
@@ -65,17 +65,14 @@ public class PanelEnfermero extends JPanel {
         // Inicializar los paneles específicos del enfermero
         panelAsignarCama = new PanelAsignarCama();
         panelDarAlta = new PanelDarAlta();
-        verPacientesAsignadosEnfermero = new PanelVerPacientesEnfermero(); // Asegúrate de que esta clase exista
 
         // Añadir los paneles al CardLayout
         infoPanel.add(panelAsignarCama, "AsignarCama");
         infoPanel.add(panelDarAlta, "DarAlta");
-        infoPanel.add(verPacientesAsignadosEnfermero, "VerPacientes");
 
         String[] buttonLabels = {
             "Asignar Cama",
             "Dar Alta",
-            "Ver Datos Pacientes",
             "Cerrar Sesión"
         };
 
@@ -121,9 +118,6 @@ public class PanelEnfermero extends JPanel {
                 break;
             case "Dar Alta":
                 panelName = "DarAlta";
-                break;
-            case "Ver Datos Pacientes":
-                panelName = "VerPacientes";
                 break;
             default:
                 // Manejar un caso por defecto o un error si el nombre no coincide
