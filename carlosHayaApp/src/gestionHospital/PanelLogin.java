@@ -107,6 +107,7 @@ public class PanelLogin extends JPanel {
 			Sesion.setUsuarioLogueado(usuario);
 
 			DBConnection db = new DBConnection();
+			db.comprobarPrimerLogin(usuario, contrasena);
 			String rol = db.iniciarSesion(usuario, contrasena);
 
 			// Llamada a método que devuelve rol o null

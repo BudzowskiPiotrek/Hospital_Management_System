@@ -44,6 +44,34 @@ public class DBConnection {
 
 	// -------------- GESTION DE LOGIN --------------
 
+	public boolean comprobarPrimerLogin(String dni, String nuevaContrasena) {
+	
+		Statement declaracionSQL = null; // Declaración de la sentencia
+		ResultSet conjuntoResultados = null; // Declaración del resultado de la consulta
+
+		try {
+			conectar();
+			declaracionSQL = conn.createStatement();
+			String sqlVerificacion = "SELECT contrasena FROM Empleado WHERE usuario_dni = '" + dni + "'";
+			conjuntoResultados = declaracionSQL.executeQuery(sqlVerificacion);
+			if (conjuntoResultados.next()) {
+				String contrasenaActual = conjuntoResultados.getString("contrasena");
+				if (contrasenaActual.equalsIgnoreCase("null")) {
+					
+					String sqlActualizacion = "UPDATE Empleado SET contrasena = '" + nuevaContrasena + "' WHERE usuario_dni = '" + dni + "'";
+					int filasAfectadas = declaracionSQL.executeUpdate(sqlActualizacion); 
+					return filasAfectadas > 0;
+				}
+			} 
+				return false;
+		} catch (SQLException e) {
+			e.printStackTrace(); 
+			return false; 
+		} finally {
+			desconectar();
+		}
+	}
+
 	public String iniciarSesion(String dni, String contrasena) {
 		String sql = "SELECT u.rol FROM Usuario u " + "JOIN Empleado e ON u.dni = e.usuario_dni "
 				+ "WHERE u.dni = ? AND e.contrasena = ?";
@@ -753,13 +781,13 @@ public class DBConnection {
 		try {
 			conectar();
 			stmt = conn.createStatement();
-			
+
 			String sql = "UPDATE TurnoMantenimiento SET limpia = " + (estadoLimpia ? 1 : 0) + " WHERE sala_id = "
 					+ salaId;
-			
+
 			int filasAfectadas = stmt.executeUpdate(sql);
 			return filasAfectadas > 0;
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -767,173 +795,174 @@ public class DBConnection {
 			desconectar();
 		}
 	}
-	
-	//################################################ METODOS DE ENFERMERO ################################################################//
+
+	// ################################################ METODOS DE ENFERMERO
+	// ################################################################//
 	public List<Integer> mostrarCama() {
 		List<Integer> salas = new ArrayList<>();
 		int id = 0;
 		conectar();
-		
+
 		try {
 			Statement stat = conn.createStatement();
 			String sql = "SELECT id FROM sala WHERE disponibilidad=1 AND tipo = 'Habitacion' ";
 			ResultSet rs = stat.executeQuery(sql);
-			while(rs.next()) {
+			while (rs.next()) {
 				id = rs.getInt("id");
 				salas.add(id);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
 		return salas;
 	}
-	
+
 	public List<Paciente> mostrarPacientesSinCama() {
 		List<Paciente> paciente = new ArrayList<>();
 		String id = "";
-		String nombre="";
-		String apellido="";
+		String nombre = "";
+		String apellido = "";
 		conectar();
-		
+
 		try {
 			Statement stat = conn.createStatement();
 			String sql = "SELECT u.dni, u.nombre, u.apellido FROM usuario u INNER JOIN paciente p ON u.dni = p.usuario_dni WHERE p.alta=0 AND p.sala_id=0;";
 			ResultSet rs = stat.executeQuery(sql);
-			while(rs.next()) {
+			while (rs.next()) {
 				id = rs.getString("u.dni");
 				nombre = rs.getString("u.nombre");
 				apellido = rs.getString("u.apellido");
-				Paciente p = new Paciente(nombre,apellido,id,null,null,null,false,0);
+				Paciente p = new Paciente(nombre, apellido, id, null, null, null, false, 0);
 				paciente.add(p);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
 		return paciente;
 	}
-	
+
 	public List<Paciente> mostrarPacientesDeBaja() {
 		List<Paciente> paciente = new ArrayList<>();
 		String id = "";
-		String nombre="";
-		String apellido="";
-		int cama= 0;
+		String nombre = "";
+		String apellido = "";
+		int cama = 0;
 		conectar();
-		
+
 		try {
 			Statement stat = conn.createStatement();
 			String sql = "SELECT u.dni, u.nombre, u.apellido, p.sala_id FROM usuario u INNER JOIN paciente p ON u.dni = p.usuario_dni WHERE p.alta=0 AND p.sala_id!=0;";
 			ResultSet rs = stat.executeQuery(sql);
-			while(rs.next()) {
+			while (rs.next()) {
 				id = rs.getString("u.dni");
 				nombre = rs.getString("u.nombre");
 				apellido = rs.getString("u.apellido");
 				cama = rs.getInt("p.sala_id");
-				Paciente p = new Paciente(nombre,apellido,id,null,null,null,false,cama);
+				Paciente p = new Paciente(nombre, apellido, id, null, null, null, false, cama);
 				paciente.add(p);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
 		return paciente;
 	}
-	
+
 	public boolean actualizarDisponibilidad1(String id_sala) {
 		conectar();
 		int resultado = 0;
 		try {
-			
+
 			Statement stat = conn.createStatement();
-			String sql = "UPDATE sala SET disponibilidad=0 WHERE id="+id_sala+";";
+			String sql = "UPDATE sala SET disponibilidad=0 WHERE id=" + id_sala + ";";
 			resultado = stat.executeUpdate(sql);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
-		if(resultado>0) {
+		if (resultado > 0) {
 			return true;
-		}else {
+		} else {
 			return false;
 		}
-		
+
 	}
-	
+
 	public boolean darAlta(String dni) {
 		conectar();
 		int resultado = 0;
 		try {
 			Statement stat = conn.createStatement();
-			String sql = "UPDATE paciente SET alta=1 WHERE usuario_dni='"+dni+"';";
+			String sql = "UPDATE paciente SET alta=1 WHERE usuario_dni='" + dni + "';";
 			resultado = stat.executeUpdate(sql);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
-		if(resultado>0) {
+		if (resultado > 0) {
 			return true;
-		}else {
+		} else {
 			return false;
 		}
-		
+
 	}
+
 	public boolean actualizarPacienteSala(String dni) {
 		conectar();
 		int resultado = 0;
 		try {
 			Statement stat = conn.createStatement();
-			String sql = "UPDATE paciente SET sala_id=0 WHERE usuario_dni='"+dni+"';";
+			String sql = "UPDATE paciente SET sala_id=0 WHERE usuario_dni='" + dni + "';";
 			resultado = stat.executeUpdate(sql);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
-		if(resultado>0) {
+		if (resultado > 0) {
 			return true;
-		}else {
+		} else {
 			return false;
 		}
-		
+
 	}
-	
+
 	public boolean actualizarDisponibilidad2(String dni) {
 		conectar();
 		int resultado = 0;
 		String id_sala = "";
 		try {
-			
+
 			Statement stat = conn.createStatement();
-			String sql1 = "SELECT sala_id FROM paciente WHERE usuario_dni='"+dni+"';";
+			String sql1 = "SELECT sala_id FROM paciente WHERE usuario_dni='" + dni + "';";
 			ResultSet rs = stat.executeQuery(sql1);
-			if(rs.next()) {
+			if (rs.next()) {
 				id_sala = rs.getString("sala_id");
 			}
-			String sql = "UPDATE sala SET disponibilidad=1 WHERE id="+id_sala+";";
+			String sql = "UPDATE sala SET disponibilidad=1 WHERE id=" + id_sala + ";";
 			resultado = stat.executeUpdate(sql);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			desconectar();
 		}
-		if(resultado>0) {
+		if (resultado > 0) {
 			return true;
-		}else {
+		} else {
 			return false;
 		}
-		
+
 	}
-	
 
 }
