@@ -1,4 +1,4 @@
-# Hospital Management System (HMS) - Carlos Haya Project
+# Hospital Management System
 
 A comprehensive ERP solution designed to digitize and optimize hospital operations, ranging from human resources and infrastructure logistics to clinical patient records.
 
