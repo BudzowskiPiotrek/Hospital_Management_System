@@ -1,75 +1,56 @@
-# Proyecto Fin de Curso
+# Hospital Management System (HMS) - Carlos Haya Project
 
-**🏥Proyecto Hospital🩺**
+A comprehensive ERP solution designed to digitize and optimize hospital operations, ranging from human resources and infrastructure logistics to clinical patient records.
 
-El Hospital Carlos Haya nos ha encargado la gestión de su hospital, se trata de un trabajo de gran envergadura por ese motivo se plantea la realización del proyecto en grupo. El objetivo del sistema es digitalizar la administración de recursos humanos, infraestructura y pacientes, permitiendo una gestión eficiente del personal, salas, turnos y registros médicos.
+## 🚀 Project Overview
+This system provides an integrated platform for **Carlos Haya Hospital** to streamline its daily workflows. The objective is to manage the interaction between medical staff, administrative personnel, and patients while maintaining full control over the hospital's physical resources.
 
-El sistema debe permitir operar con diferentes perfiles de usuarios, médicos, enfermeros, administrativos, personal de mantenimiento y pacientes cada uno tendrá funcionalidades distintas. También deberá contemplar la gestión de las salas del hospital (habitaciones, quirófanos, consultorios), el historial médico de pacientes, los turnos del personal y otras funciones clave para el funcionamiento diario.
+## 🛠 Key Features
 
-Algunas de las funciones de nuestro personal 👨‍⚕️🩺 (pero no las únicas) deben ser:
+### 1. Workforce & HR Management 👑
+* **Staff Lifecycle:** Full management (Create, Read, Update, Delete) of physicians, nurses, administrative, and maintenance staff.
+* **Role-Based Access Control (RBAC):**
+    * **Admins:** Full system authority over staff, patients, and facility settings.
+    * **Administrative Staff:** Hospital data consultation, patient-to-doctor assignment, and appointment scheduling.
+* **Shift Management:** Scheduling and resource allocation for work shifts and specific hospital wards.
 
-- Entre los empleados distinguiremos entre los administradores que podrá gestionar empleados y pacientes (registrar, eliminar o modificar), y podrá también gestionar salas. Los administrativos no administradores por su parte, podrán consultar todos los datos del hospital, asignar pacientes a médicos y dar citas.
-- Los médicos podrán registrar un diagnóstico a un paciente y consultar su historial médico, registrar una receta, ver los pacientes que tiene asignados. Los enfermeros son los encargados de asignar cama a un paciente y marcar el alta médica de un paciente si el médico lo solicito.
+### 2. Patient Care & EHR 👩‍⚕️🩹
+* **Electronic Health Records (EHR):** Tracking of medical consultations, diagnoses, and prescriptions.
+* **Patient Admissions:** Secure registration (Personal ID, insurance, contact info) and room assignment.
+* **Clinical Workflow:** Doctors manage clinical entries and prescriptions; nursing staff handle bed allocation and discharge procedures.
 
-El proyecto debe de contemplar los siguientes requerimientos:
+### 3. Infrastructure & Logistics 🏢
+* **Facility Tracking:** Real-time management of rooms, operating theaters, and outpatient offices.
+* **Availability Control:** Live monitoring of room occupancy and maintenance status.
 
-- Gestión de Personal👑:
-    - Alta, baja y modificación de empleados: médicos, enfermeros, administrativos, mantenimiento.
-    - Asignación de roles, turnos y salas de trabajo.
-    - Control de disponibilidad y horario.
-- Gestión de Pacientes👩‍⚕️🩹:
-    - Registro de pacientes (nombre, DNI, contacto, obra social, etc.).
-    - Historial médico (consultas, diagnósticos, intervenciones).
-    - Asignación de habitaciones.
-    - Solicitudes de atención médica.
-- Gestión de Infraestructura🏢:
-    - Registro de salas del hospital (habitaciones, quirófanos, consultorios).
-    - Control de disponibilidad y ocupación.
-    - Mantenimiento de salas.
-- Turnos y Consultas🧑‍⚕️ :
-    - Solicitud y asignación de turnos.
-    - Agenda de médicos y enfermeros.
-    - Registro de visitas, diagnósticos y tratamientos.
-- Reportes y Estadísticas 👷‍♂️🔧:
-    - Listado de pacientes internados actualmente.
-    - Disponibilidad de habitaciones.
-    - Reporte de actividad por médico o enfermero.
-    - Historial clínico completo de un paciente.
+### 4. Scheduling & Analytics 🧑‍⚕️
+* **Appointment System:** Appointment requests and physician agendas.
+* **Reporting Engine:** Automated reports on current inpatients, room availability, and staff activity logs.
 
-El proyecto debe tener **persistencia**, es decir debe mantener los datos al finalizar el proyecto y recuperar al volver a iniciar el programa. Podrá guardarse en ficheros o en base de datos, quedará a elección del grupo.
+---
 
-Presentará una **interfaz gráfica** básica para registrar los datos de los diferentes recursos. Aunque los listados pueden realizarse por consola.
+## 💻 Technical Specifications
 
-Los datos deberán contar con **validaciones** y controlarse para que no ocurran errores.
+* **Persistence:** Data is preserved between sessions using file-based storage or a database system.
+* **GUI (Graphical User Interface):** A dedicated interface for data entry and resource management.
+* **Data Integrity:** Strict validation layers to prevent errors, data corruption, or duplicates.
+* **Documentation:** Includes a comprehensive User Manual for non-technical staff.
 
-Se deberá diseñar un **manual de uso** del sistema, el objetivo es que cualquier persona sin conocimientos técnicos pueda entender como utilizar el sistema, cuales son sus funiones y como se realizan las principales acciones desde la interfaz de usuario.
+---
 
-**Evaluación:**
+## 👥 Development Team Roles
 
-Se deberán mantener dos reuniones previas a la presentación del proyecto:
+| Role | Responsibility |
+| :--- | :--- |
+| **Back-End Developer** | Core business logic, data models, and system validations. |
+| **Front-End Developer** | GUI implementation and user experience integration. |
+| **Data Architect** | Data persistence, I/O operations, and state recovery. |
+| **Lead / QA / Doc** | Project coordination, system testing, and technical documentation. |
 
-**1 Reunión:**
+---
 
-- Presentación de un diagrama de clases y casos de uso del proyecto.
-- Reparto de tareas y roles entre los integrantes, los roles más normales dentro de un grupo de desarrollo son:
-    - Desarrollador Back-End encargado de la lógica y modelo de Datos, será el encargado de diseñar e implementar las clases principales, también implementará las validaciones y gestionará la relación entre objetos y comportamientos.
-    - Desarrollador Front-End será el encargado de implementar la interfaz gráfica y conectarla con la lógica del sistema. Diseñará los formularios, menús, listados....
-    - Responsable de la Persistencia de Datos, será el encargado de diseñar como se van a guardar y recuperar los datos e implementará la carga y guardado automático. Debe velar para que no haya datos corruptos o duplicados.
-    - Coordinador del Proyecto / Testeador / Documentador su función es coordinar la comunicación entre los miembros y planificar las tareas para asegurarse de que todo esté avanzado, además probará el sistema y documentará el código.
-- Primer boceto de la interfaz gráfica y primeras clases implementadas.
+## 📅 Roadmap & Evaluation
 
-**2 Reunión :**
-
-- Demo parcial del sistema.
-- Que partes están finalizadas y cuales están en curso.
-- Que partes se plantean como mejoras para un futuro.
-- Como tienen previsto desarrollar la demo final
-
-**Presentación final**
-
-Cada grupo debe preparar una presentación de entre 30 y 40 minutos donde expongan:
-
-- Las funcionalidades implementadas
-- La estructura del sistema (modelo y diseño)
-- La lógica detrás de su arquitectura
-- Y una demostración en directo de las principales funciones del sistema.
+1.  **Phase 1:** Class diagrams, use cases, and initial GUI mockups.
+2.  **Phase 2:** Partial system demo and feature status report.
+3.  **Final Delivery:** Live demonstration of the full architecture and integrated logic.
